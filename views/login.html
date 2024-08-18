@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="./css/style.css">
+  </head>
+  <body>
+    <div class="container">
+      <h3>Login Form</h3>
+      <form id="signinForm">
+       
+        <label for="email">Enter Email:</label>
+        <input type="email" class="inp" id="email" name="email" />
+
+        <label for="password">Enter Password:</label>
+        <input type="password" class="inp" id="password" name="password" />
+
+        <button type="submit" class="btn loginbutton">Login</button>
+
+        <p><a class="createNew" href="/register">create new account</a></p>
+        <p><a class="forget-psd" href="/forget-psd">forget password</a></p>
+
+      </form>
+    </div>
+    <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.3/axios.min.js"
+    integrity="sha512-zJXKBryKlsiDaWcWQ9fuvy50SG03/Qc5SqfLXxHmk9XiUUbcD9lXYjHDBxLFOuZSU6ULXaJ69bd7blSMEgxXNQ=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+
+    ></script>
+    <script src="./js/index.js"></script>
+  </body>
+</html>

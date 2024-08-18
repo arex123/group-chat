@@ -1,10 +1,12 @@
 
-console.log("singup page")
-document.querySelector('.loginbtn').onclick = ()=>{
-  window.location.href = "/user/showLogin"
-}
+const serverURL = "http://localhost:4002"
+let register = document.querySelector('#registerForm')
+if(register)
+register.addEventListener('submit',handleSubmit)
 
-document.querySelector('#registerForm').addEventListener('submit',handleSubmit)
+let login = document.querySelector('#signinForm')
+if(login)
+login.addEventListener('submit',handleLoginSubmit)
 
 function handleSubmit(event) {
     console.log("submitting")
@@ -18,9 +20,9 @@ function handleSubmit(event) {
 
   let signupbuttontag = document.querySelector('.signupbutton')
   let messageTag = document.createElement('p')
-
+    console.log(data)
   axios
-    .post("http://localhost:4002/user/register", data)
+    .post(serverURL+"/user/register", data)
     .then((result) => {
       console.log(result);
     //   if(result.data?.error){
@@ -48,4 +50,51 @@ function handleSubmit(event) {
     //     messageTag.remove()
     //   },3000)
     });
+}
+
+function handleLoginSubmit(event){
+  event.preventDefault();
+  console.log("handle subitting")
+  const data = {
+    email: event.target.email.value,
+    password: event.target.password.value,
+  };
+
+  let loginbuttontag = document.querySelector(".loginbutton");
+  let messageTag = document.createElement("p");
+
+  console.log("d",data)
+  axios
+    .post(serverURL+"/user/login", data)
+    .then((result) => {
+      console.log(result);
+      if (result.data?.error) {
+        messageTag.textContent = result.data?.error;
+        messageTag.id = "failed";
+        loginbuttontag.parentElement.appendChild(messageTag);
+
+        let time = setTimeout(() => {
+          messageTag.remove();
+        }, 3000);
+      } else {
+        localStorage.setItem("token", result.data.token);
+        window.location.href = serverURL+"/";
+      }
+    })
+    .catch((err) => {
+      console.log("err ", err);
+
+      messageTag.textContent = err?.response?.data?.message;
+      if(!messageTag.textContent){
+        messageTag.textContent = "something went wrong";
+      }
+
+      messageTag.id = "failed";
+      loginbuttontag.parentElement.appendChild(messageTag);
+
+      let time = setTimeout(() => {
+        messageTag.remove();
+      }, 3000);
+    });
+
 }

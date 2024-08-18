@@ -15,7 +15,7 @@ body {
     box-sizing: border-box;
   }
 
-  .signupbutton {
+  .btn {
     width: 100%;
     background-color: #4caf50;
     color: white;
@@ -26,7 +26,7 @@ body {
     cursor: pointer;
   }
 
-  .signupbutton:hover {
+  .btn:hover {
     background-color: #45a049;
   }
 
@@ -47,7 +47,7 @@ body {
   #failed{
     color:red;
   }
- .loginbtn{
+ .loginbtn,.createAccount{
   color: blue;
   cursor: pointer;
   text-decoration: underline;
@@ -56,3 +56,10 @@ body {
  .heading{
   text-align: center;
  }
+ .createNew {
+  color: blue;
+  cursor: pointer;
+}
+.createNew:hover {
+  text-decoration: underline;
+}
