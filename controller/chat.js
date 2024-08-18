@@ -18,3 +18,21 @@ exports.chats =async (req,res,next)=>{
         })
     }
 }
+
+exports.getChats = async (req,res,next)=>{
+    try{
+
+        let messages = await Chat.findAll()
+
+        res.status(200).json({
+            success:true,
+            messages
+        })
+        
+    }catch(err){
+        console.log("err while getting chats: ",err)
+        res.status(500).json({
+            success:false
+        })
+    }
+}
