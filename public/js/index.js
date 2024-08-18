@@ -78,7 +78,7 @@ function handleLoginSubmit(event){
         }, 3000);
       } else {
         localStorage.setItem("token", result.data.token);
-        window.location.href = serverURL+"/";
+        window.location.href = serverURL+"/chat-screen";
       }
     })
     .catch((err) => {
@@ -98,3 +98,4 @@ function handleLoginSubmit(event){
     });
 
 }
+

@@ -1,0 +1,47 @@
+body{
+    margin: 0;
+}
+.container{
+    /* display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: rebeccapurple; */
+}
+.chats>p{
+    padding: 10px;
+}
+.chats>p:nth-child(even){
+    background-color: gray;
+}
+.upper-section{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    .chats{
+        /* background-color: red; */
+        width: 40%;
+    }
+}
+.lower-section{
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(40, 75, 134);
+    
+    input{
+        width: 30%;
+        height: 35px;
+        margin: 10px;
+    }
+    button{
+        height: 35px;
+        margin: 0;
+    }
+}
