@@ -17,7 +17,9 @@
         <input type="email" class="inp" name="email" id="email" required />
 
         <label for="phone">Phone</label>
-        <input type="tel" class="inp" name="phone" id="phone" required />
+        <input type="tel" class="inp" name="phone" id="phone" pattern="^[6-9]\d{9}$"
+        title="Please enter a valid 10-digit Indian phone number starting with 6, 7, 8, or 9."
+         required />
 
         <label for="password">Password</label>
         <input
