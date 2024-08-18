@@ -8,11 +8,19 @@ const fs = require('fs')
 const app = express()
 
 const sequelize = require('./utils/database')
-const userRouter = require('./routes/user')
+
+const userRouter = require('./routes/user');
+const chatRoutes = require('./routes/chat')
+
+
+const User = require('./models/user');
+const Chat = require('./models/chat');
+
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname,'public')))
 
 app.use('/user',userRouter)
+app.use(chatRoutes)
 
 
 app.use((req,res) => {
@@ -31,6 +39,8 @@ app.use((req,res) => {
         return res.sendFile(path.join(__dirname, `/views/error404.html`));
 });
 
+User.hasMany(Chat)
+Chat.belongsTo(User)
 
 sequelize
 .sync()
