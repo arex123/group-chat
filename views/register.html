@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    
+    <div class="container">
+        <h2 class="heading">Register Form</h2>
+        <form>
+            <label for="name">Name</label>
+            <input type="text" class="inp" name="name" id="name" required>
+
+            <label for="email">Email</label>
+            <input type="email" class="inp" name="email" id="email" required>
+
+            <label for="phone">Phone</label>
+            <input type="tel" class="inp" name="phone" id="phone" required>
+
+            <label for="password">Password</label>
+            <input type="password" class="inp" name="password" id="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+            title="Password must be 8 characters including 1 uppercase letter, 1 lowercase letter and numeric characters"
+            required >
+
+            <button type="submit" class="signupbutton">Register</button>
+            <p>Already have an account? <span class="loginbtn"> Login</span></p>
+        </form>
+    </div>
+        <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.3/axios.min.js"
+        integrity="sha512-zJXKBryKlsiDaWcWQ9fuvy50SG03/Qc5SqfLXxHmk9XiUUbcD9lXYjHDBxLFOuZSU6ULXaJ69bd7blSMEgxXNQ=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    ></script>
+    <script src="./js/signup.js"></script>
+</body>
+</html>
