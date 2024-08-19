@@ -30,8 +30,8 @@ app.use((req,res) => {
     // console.log("file exist ",fileExists)
 
     if(req.url === '/'){
-        req.url = 'home.html';
-        return res.sendFile(path.join(__dirname, `/views/${req.url}.html`));
+        req.url = 'chat-screen.html';
+        return res.sendFile(path.join(__dirname, `/views/${req.url}`));
     }
     else if(fileExists)
         return res.sendFile(path.join(__dirname, `/views/${req.url}.html`));
