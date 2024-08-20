@@ -11,16 +11,18 @@ const sequelize = require('./utils/database')
 
 const userRouter = require('./routes/user');
 const chatRoutes = require('./routes/chat')
-
+const groupRoutes = require('./routes/group')
 
 const User = require('./models/user');
 const Chat = require('./models/chat');
+const Group = require('./models/group');
 
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname,'public')))
 
 app.use('/user',userRouter)
 app.use(chatRoutes)
+app.use('/group',groupRoutes)
 
 
 app.use((req,res) => {
@@ -41,6 +43,13 @@ app.use((req,res) => {
 
 User.hasMany(Chat)
 Chat.belongsTo(User)
+
+User.belongsToMany(Group,{through:'UserGroup'})
+Group.belongsToMany(User,{through:'UserGroup'})
+
+
+Group.hasMany(Chat)
+Chat.belongsTo(Group)
 
 sequelize
 .sync()

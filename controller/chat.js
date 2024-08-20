@@ -6,9 +6,10 @@ exports.chats =async (req,res,next)=>{
     console.log("req body for chats ",req.body)
 
     try{
-
         await req.user.createChat({
-            message:req.body.message
+            message:req.body.message,
+            messageOwner:req.user.name,
+            groupId:req.body.groupId
         })
         res.status(200).json({
             success:true
@@ -24,26 +25,30 @@ exports.chats =async (req,res,next)=>{
 exports.getChats = async (req,res,next)=>{
     console.log("param ",req.params)
     try{
-        let getChatFromId = req.params?.id || 0
+        let getChatFromId = req.params.id 
+        let groupId = req.params.groupId
 
+        console.log("getChatFromId12 : ",getChatFromId)
         let messages1 = await Chat.findAll({
             where: {
                 id: {
                     [Op.gt]: getChatFromId
-                }
+                },
+                groupId:groupId
             },
             attributes: [
                 "id",
-                "message"
+                "message",
+                "messageOwner"
             ],
-            include: [
-                {
-                    model: User,
-                    attributes: [
-                        "name"
-                    ]
-                }
-            ]
+            // include: [
+            //     {
+            //         model: User,
+            //         attributes: [
+            //             "name"
+            //         ]
+            //     }
+            // ]
         });
 
         res.status(200).json({

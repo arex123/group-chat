@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat screen</title>
+    <link rel="stylesheet" href="./css/chat.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="upper-section">
+        <div class="left">
+          <span id="createGroupCont">create Group</span>
+          <div id="myModal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <div>
+                <form id="createGroup">
+                  <!-- <h2>Give Name to Group</h2> -->
+                  <label for="newGroupName">Group name:</label>
+                  <input type="text" id="newGroupName" pattern="^[a-zA-Z0-9]+$" 
+                  title="Please use only alphabets and numbers (no spaces or special characters)."
+                  required/>
+                  <button type="submit">Create</button>
+                </form>
+              </div>
+            </div>
+          </div>
+          <!-- <p>join group</p> -->
+          <div class="group-list">
+            
+          </div>
+        </div>
+        <div class="right">
+          <div>
+            <h1 class="curr-groupname">Group Name</h1>
+            
+
+          </div>
+          <div class="chats chat-list"></div>
+          <div class="lower-section">
+            <input
+              type="text"
+              name="message"
+              placeholder="Type message"
+              id="message"
+            />
+            <button id="sendChat" type="submit">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.3/axios.min.js"
+      integrity="sha512-zJXKBryKlsiDaWcWQ9fuvy50SG03/Qc5SqfLXxHmk9XiUUbcD9lXYjHDBxLFOuZSU6ULXaJ69bd7blSMEgxXNQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="./js/chat.js"></script>
+  </body>
+</html>

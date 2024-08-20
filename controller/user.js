@@ -1,7 +1,9 @@
 const User = require("../models/user");
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 const Sequelize = require('sequelize')
+const { Op } = require('sequelize');
+
 exports.register =async (req,res,next)=>{
     try{
         const {name, email, phone, password} = req.body;
@@ -67,4 +69,25 @@ exports.login = async(req,res,next)=>{
 
         }
     })
+}
+
+exports.getAllUsers = async(req,res)=>{
+    try{
+
+        let users = await User.findAll({
+            where:{
+                id: {
+                    [Op.not]: req.user.id
+                }
+            },
+            attributes:[
+                'id',
+                'name'
+            ]
+        })
+
+        res.json(users)
+    }catch(err){
+        res.status(500).json({error:"Error while fetching users"})
+    }
 }

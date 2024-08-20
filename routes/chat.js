@@ -4,7 +4,7 @@ const { chats, getChats } = require('../controller/chat')
 const router = express.Router()
 
 router.post('/chat',authenticate,chats)
-router.get('/getChats/:id',authenticate,getChats)
+router.get('/getChats/:id/:groupId',authenticate,getChats)
 
 module.exports = router
 

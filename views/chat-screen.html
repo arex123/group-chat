@@ -3,29 +3,347 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chat screen</title>
-    <link rel="stylesheet" href="./css/chat.css">
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="./css/chat.css" />
   </head>
   <body>
-    <div class="container">
-      <div class="upper-section">
-        <h1>chat screen</h1>
-        <div class="chats chat-list">
-          
+    <section id="chatContainerSection">
+      <div class="chatDivContainer">
+        <div class="navigationMenu"></div>
+
+        <div class="chatSidebar">
+          <div class="chatSidebar__topbar">
+            <h2>Chats</h2>
+            <div class="vertical-dot-div">
+              <i class="fa-solid fa-ellipsis-vertical"></i>
+              <div class="vertical-dot-div__options">
+                <p class="openGCS" onclick="handleOpenGCS()">New Group</p>
+                <p onclick="handleLogOut()">Log out</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="createGroupSection">
+
+            <div class="createGroupSection_top">
+              <div class="createGroupSection_topleft">
+
+                <i class="fa-solid fa-xmark" onclick="closeGCS()"></i>
+                <p>Add Group Members</p>
+              </div>
+
+              <!-- <i class="fa-solid fa-arrow-right nextSecGrp"></i> -->
+            </div>
+
+            <div class="createGroupSection_namesearch">
+              <input type="text" id="newGroupName" placeholder="Enter Group Name">
+              <button class="createGrp" onclick="handleCreateGroup()">Create</button>
+            </div>
+
+            <div class="createGroupSection_userlistcont">
+
+              <div class="createGroupSection_userlist">
+                
+                
+              </div>
+              
+            </div>
+
+          </div>
+          <div class="chatSidebar__searchbar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input type="text" placeholder="Search" id="searchGroups" />
+          </div>
+          <div class="chatSidebar__grouplist">
+            <!-- <div class="groupItem" id="111">
+              <div class="groupItem_profileImgDiv">
+                <img
+                  id="groupItem_profileImg"
+                  src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQAtAMBIgACEQEDEQH/xAAbAAEAAgMBAQAAAAAAAAAAAAAABAUBAwYCB//EADEQAQACAQIEBAIJBQAAAAAAAAABAgMEEQUhMUESUWFxEyIUIzI0QlKBkcEzYqGi0f/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwD6SAAAAAAB3AO/VYabhlrxFs8zjj8sdVlh0+HDG2PHEevcFDTDlv8AYx3n1iHqdLnr1w3/AGdEA5e0TWdrRNZ8pg7untWLRtaImJ80LPw3Dff4f1dvToClG3UafLp7RGSu2/Se0tQAAAAAAAAAAAAAAHPtG660GhjBHxMkROXt5VRuE6aLW+Pb8M7V/wCraOgMgAAAAA8ZcdctJpeu9Z7KLWaW2lybRzrbpb+HQNWow1z4ppbv0nykHODN6zjvaluU1naWAAAAAAAAAAACI36Dfoa+PV4o/u3Be4McYcNMcfhjZsAAAAAAAAAFPxfF4ctckfjjafeFeuuLV8Wk3/LaJUoAAAAAAAAAACTw377j/VGbdLf4epx2nlEWjcHRjEMgAAAAAAAAh8U+5394Ua44xfbBSne07/pCnAAAAAAAAAAAPfoAL/QZ/jaatp+1Hy290lQaDU/Rsvzc6W5W9F9ExMRMc4kGQAAAAAAQ+I6r6Pj8NP6lunp6greJZvjamfDPy0+WEUAAAAAAAAAAAAAE3Q66cH1eSZnHP+qEm6Xh2TNHiy746e3OQXNL1vWLUtExPeHpqwYMeCvhxV8Md/VtAAAABE1mtpgjau1snaN+nupMl7ZLze/O09ZW+q4bjyzNsfyXn9YlVZsOTDfw5K7eoNYAAAAAAAAAAAD1Slsl4pSszaezOLFfNkimOIm0/wCPVe6PTU01PDXnaftW8watHw+mHa+Ta+Tz7QmgAAAAAAA8ZcVM1JpkrFqz2ewFFrdDfT/PSZvTz25wiezp5jkqOIaL4W+XDG9es18gV4AAAAAAADMRNrRWI3meUQx3WXCNPvM57R05V/kEzQ6WNNj2nneftSlAAAAAAAAAAAAxMbwyAo+IaT6Pfx0jbHbpHlKG6TPirmx2x26TDnclJx5LUt1rPMHkAAAAADaZ5R1mdodJgxRiw1pHaFHw6nj1lI8vm/Z0AAAAAAAAAAAAAAACn4xh8OWmSOluU+8LhE4nj8ektPevzAogAAAAAWHBo3zZJ8qrgAAAAAAAAAAAAAAAGvNETivE9JiQBzYAAAP/2Q=="
+                  alt="img"
+                />
+              </div>
+              <p id="groupItem_profileName">Group 1</p>
+              <p id="groupItem_profilePendingMsg">400</p>
+            </div>
+            <div class="groupItem" id="222">
+              <div class="groupItem_profileImgDiv">
+                <img
+                  id="groupItem_profileImg"
+                  src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQAtAMBIgACEQEDEQH/xAAbAAEAAgMBAQAAAAAAAAAAAAAABAUBAwYCB//EADEQAQACAQIEBAIJBQAAAAAAAAABAgMEEQUhMUESUWFxEyIUIzI0QlKBkcEzYqGi0f/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwD6SAAAAAAB3AO/VYabhlrxFs8zjj8sdVlh0+HDG2PHEevcFDTDlv8AYx3n1iHqdLnr1w3/AGdEA5e0TWdrRNZ8pg7untWLRtaImJ80LPw3Dff4f1dvToClG3UafLp7RGSu2/Se0tQAAAAAAAAAAAAAAHPtG660GhjBHxMkROXt5VRuE6aLW+Pb8M7V/wCraOgMgAAAAA8ZcdctJpeu9Z7KLWaW2lybRzrbpb+HQNWow1z4ppbv0nykHODN6zjvaluU1naWAAAAAAAAAAACI36Dfoa+PV4o/u3Be4McYcNMcfhjZsAAAAAAAAAFPxfF4ctckfjjafeFeuuLV8Wk3/LaJUoAAAAAAAAAACTw377j/VGbdLf4epx2nlEWjcHRjEMgAAAAAAAAh8U+5394Ua44xfbBSne07/pCnAAAAAAAAAAAPfoAL/QZ/jaatp+1Hy290lQaDU/Rsvzc6W5W9F9ExMRMc4kGQAAAAAAQ+I6r6Pj8NP6lunp6greJZvjamfDPy0+WEUAAAAAAAAAAAAAE3Q66cH1eSZnHP+qEm6Xh2TNHiy746e3OQXNL1vWLUtExPeHpqwYMeCvhxV8Md/VtAAAABE1mtpgjau1snaN+nupMl7ZLze/O09ZW+q4bjyzNsfyXn9YlVZsOTDfw5K7eoNYAAAAAAAAAAAD1Slsl4pSszaezOLFfNkimOIm0/wCPVe6PTU01PDXnaftW8watHw+mHa+Ta+Tz7QmgAAAAAAA8ZcVM1JpkrFqz2ewFFrdDfT/PSZvTz25wiezp5jkqOIaL4W+XDG9es18gV4AAAAAAADMRNrRWI3meUQx3WXCNPvM57R05V/kEzQ6WNNj2nneftSlAAAAAAAAAAAAxMbwyAo+IaT6Pfx0jbHbpHlKG6TPirmx2x26TDnclJx5LUt1rPMHkAAAAADaZ5R1mdodJgxRiw1pHaFHw6nj1lI8vm/Z0AAAAAAAAAAAAAAACn4xh8OWmSOluU+8LhE4nj8ektPevzAogAAAAAWHBo3zZJ8qrgAAAAAAAAAAAAAAAGvNETivE9JiQBzYAAAP/2Q=="
+                  alt="img"
+                />
+              </div>
+              <p id="groupItem_profileName">Group 2</p>
+              <p id="groupItem_profilePendingMsg">20</p>
+            </div> -->
+          </div>
+        </div>
+
+        <div class="contentArea">
+          <div class="contentDefaultConversation">
+            <i class="fa-brands fa-whatsapp"></i>
+            <p>Select group to view conversation</p>
+          </div>
+          <div class="contentConversation">
+            <div class="contentConversation_topbar">
+              <h5 class="groupname">Chats</h5>
+              <div class="groupexit">
+                <i class="fa-solid fa-right-from-bracket"></i>
+              </div>
+            </div>
+            <div class="contentConversation_conversation">
+              <div class="scrollconversation">
+                <main class="msger-chat">
+                  <!-- <div class="msg left-msg">
+                    <div
+                      class="msg-img"
+                      style="
+                        background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg);
+                      "
+                    ></div>
+
+                    <div class="msg-bubble">
+                      <div class="msg-info">
+                        <div class="msg-info-name">BOT</div>
+                        <div class="msg-info-time">12:45</div>
+                      </div>
+
+                      <div class="msg-text">
+                        Hi, welcome to SimpleChat! Go ahead and send me a
+                        message. 😄
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="msg right-msg">
+                    <div
+                      class="msg-img"
+                      style="
+                        background-image: url(https://image.flaticon.com/icons/svg/145/145867.svg);
+                      "
+                    ></div>
+
+                    <div class="msg-bubble">
+                      <div class="msg-info">
+                        <div class="msg-info-name">Sajad</div>
+                        <div class="msg-info-time">12:46</div>
+                      </div>
+
+                      <div class="msg-text">
+                        You can change your name in JS section!
+                      </div>
+                    </div>
+                  </div> -->
+
+                  <!-- <div class="msg left-msg">
+                    <div
+                      class="msg-img"
+                      style="
+                        background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg);
+                      "
+                    ></div>
+
+                    <div class="msg-bubble">
+                      <div class="msg-info">
+                        <div class="msg-info-name">BOT</div>
+                        <div class="msg-info-time">12:45</div>
+                      </div>
+
+                      <div class="msg-text">
+                        Hi, welcome to SimpleChat! Go ahead and send me a
+                        message. 😄
+                      </div>
+                    </div>
+                  </div>
+                  <div class="msg left-msg">
+                    <div
+                      class="msg-img"
+                      style="
+                        background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg);
+                      "
+                    ></div>
+
+                    <div class="msg-bubble">
+                      <div class="msg-info">
+                        <div class="msg-info-name">BOT</div>
+                        <div class="msg-info-time">12:45</div>
+                      </div>
+
+                      <div class="msg-text">
+                        Hi, welcome to SimpleChat! Go ahead and send me a
+                        message. 😄
+                      </div>
+                    </div>
+                  </div>
+                  <div class="msg left-msg">
+                    <div
+                      class="msg-img"
+                      style="
+                        background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg);
+                      "
+                    ></div>
+
+                    <div class="msg-bubble">
+                      <div class="msg-info">
+                        <div class="msg-info-name">BOT</div>
+                        <div class="msg-info-time">12:45</div>
+                      </div>
+
+                      <div class="msg-text">
+                        Hi, welcome to SimpleChat! Go ahead and send me a
+                        message. 😄
+                      </div>
+                    </div>
+                  </div>
+                  <div class="msg left-msg">
+                    <div
+                      class="msg-img"
+                      style="
+                        background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg);
+                      "
+                    ></div>
+
+                    <div class="msg-bubble">
+                      <div class="msg-info">
+                        <div class="msg-info-name">BOT</div>
+                        <div class="msg-info-time">12:45</div>
+                      </div>
+
+                      <div class="msg-text">
+                        Hi, welcome to SimpleChat! Go ahead and send me a
+                        message. 😄
+                      </div>
+                    </div>
+                  </div>
+                  <div class="msg left-msg">
+                    <div
+                      class="msg-img"
+                      style="
+                        background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg);
+                      "
+                    ></div>
+
+                    <div class="msg-bubble">
+                      <div class="msg-info">
+                        <div class="msg-info-name">BOT</div>
+                        <div class="msg-info-time">12:45</div>
+                      </div>
+
+                      <div class="msg-text">
+                        Hi, welcome to SimpleChat! Go ahead and send me a
+                        message. 😄
+                      </div>
+                    </div>
+                  </div>
+                  <div class="msg left-msg">
+                    <div
+                      class="msg-img"
+                      style="
+                        background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg);
+                      "
+                    ></div>
+
+                    <div class="msg-bubble">
+                      <div class="msg-info">
+                        <div class="msg-info-name">BOT</div>
+                        <div class="msg-info-time">12:45</div>
+                      </div>
+
+                      <div class="msg-text">
+                        Hi, welcome to SimpleChat! Go ahead and send me a
+                        message. 😄
+                      </div>
+                    </div>
+                  </div>
+                  <div class="msg left-msg">
+                    <div
+                      class="msg-img"
+                      style="
+                        background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg);
+                      "
+                    ></div>
+
+                    <div class="msg-bubble">
+                      <div class="msg-info">
+                        <div class="msg-info-name">BOT</div>
+                        <div class="msg-info-time">12:45</div>
+                      </div>
+
+                      <div class="msg-text">
+                        Hi, welcome to SimpleChat! Go ahead and send me a
+                        message. 😄
+                      </div>
+                    </div>
+                  </div>
+                  <div class="msg left-msg">
+                    <div
+                      class="msg-img"
+                      style="
+                        background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg);
+                      "
+                    ></div>
+
+                    <div class="msg-bubble">
+                      <div class="msg-info">
+                        <div class="msg-info-name">BOT</div>
+                        <div class="msg-info-time">12:45</div>
+                      </div>
+
+                      <div class="msg-text">
+                        Hi, welcome to SimpleChat! Go ahead and send me a
+                        message. 😄
+                      </div>
+                    </div>
+                  </div>
+                  <div class="msg left-msg">
+                    <div
+                      class="msg-img"
+                      style="
+                        background-image: url(https://image.flaticon.com/icons/svg/327/327779.svg);
+                      "
+                    ></div>
+
+                    <div class="msg-bubble">
+                      <div class="msg-info">
+                        <div class="msg-info-name">BOT</div>
+                        <div class="msg-info-time">12:45</div>
+                      </div>
+
+                      <div class="msg-text">
+                        Hi, welcome to SimpleChat! Go ahead and send me a
+                        message. 😄
+                      </div>
+                    </div>
+                  </div> -->
+                </main>
+              </div>
+            </div>
+            <div class="contentConversation_inputContainer">
+              <input
+                type="text"
+                placeholder="Type message"
+                id="messageToSend"
+              />
+            </div>
+          </div>
         </div>
       </div>
-
-      <div class="lower-section">
-        <input type="text" name="message" id="message"/>
-        <button id="sendChat" type="submit">Send</button>
-      </div>
-    </div>
-
+    </section>
+   
     <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.3/axios.min.js"
-    integrity="sha512-zJXKBryKlsiDaWcWQ9fuvy50SG03/Qc5SqfLXxHmk9XiUUbcD9lXYjHDBxLFOuZSU6ULXaJ69bd7blSMEgxXNQ=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.3/axios.min.js"
+      integrity="sha512-zJXKBryKlsiDaWcWQ9fuvy50SG03/Qc5SqfLXxHmk9XiUUbcD9lXYjHDBxLFOuZSU6ULXaJ69bd7blSMEgxXNQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
     ></script>
     <script src="./js/chat.js"></script>
   </body>
