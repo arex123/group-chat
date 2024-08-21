@@ -13,6 +13,10 @@ const Group = sequelize.define('group',{
         allowNull:false,
         unique:true
     },
+    groupDescription:{
+        type:Sequelize.STRING,
+        allowNull:true,
+    },
     groupOwnerId:{
         type:Sequelize.STRING,
         allowNull:false

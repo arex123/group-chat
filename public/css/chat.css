@@ -57,69 +57,66 @@ body {
   color: white;
   overflow-y: scroll;
 }
-.createGroupSection_top{
-
+.createGroupSection_top {
   display: flex;
   justify-content: space-between;
-  padding:10px 20px;
+  padding: 10px 20px;
   align-items: center;
 }
-.createGroupSection_topleft{
+.createGroupSection_topleft {
   display: flex;
   justify-content: center;
   /* padding:10px 20px; */
   align-items: center;
 }
-.nextSecGrp{
+.nextSecGrp {
   cursor: pointer;
-  color: #04A784;
+  color: #04a784;
   font-size: 25px;
 }
-.createGroupSection_userlist{
+.createGroupSection_userlist {
   padding: 20px;
   position: relative;
-  z-index: 1055;  
-  
+  z-index: 1055;
 }
 
-.userItems{
+.userItems {
   margin-top: 20px;
 }
-.fa-xmark{
-  color: #8796A1;
-font-size: 30px;
-margin-right: 40px;
+.fa-xmark {
+  color: #8796a1;
+  font-size: 30px;
+  margin-right: 40px;
 }
-.createGroupSection_namesearch{
+.createGroupSection_namesearch {
   display: flex;
   justify-content: center;
   align-items: center;
   padding-top: 30px;
 }
 
-#newGroupName{
+#newGroupName {
   width: 60%;
   outline: none;
   color: white;
   border: none;
   font-size: 16px;
   background-color: transparent;
-  border-bottom: 1px solid rgba(134, 150, 160, .15);
+  border-bottom: 1px solid rgba(134, 150, 160, 0.15);
   display: flex;
   justify-content: space-evenly;
   align-items: center;
 }
 
-
-.createGrp{
+.createGrp {
   font-size: 15px;
   padding: 10px;
   border-radius: 5px;
   border: none;
-  background-color:#04A784 ;
+  background-color: #04a784;
   cursor: pointer;
 }
-.createGrp:hover{
+.createGrp:hover {
   color: white;
 }
 
@@ -394,6 +391,194 @@ margin-right: 40px;
   margin: 0 0 0 10px;
 }
 
-.selectedUser{
+.selectedUser {
   background-color: #233138;
+}
+
+.groupSettings {
+  cursor: pointer;
+}
+.groupSettingsSection {
+  height: 100%;
+  width: 0;
+  background-color: #111a20;
+  transition: all 0.2s;
+  transform-origin: right;
+  display: none;
+  overflow-y: scroll;
+}
+.groupSettingsSection_open {
+  display: block;
+  width: 80%;
+}
+.groupSettingsSection_topbar {
+  margin: 10px 35px;
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+}
+.groupSettingsSection_topbar p {
+}
+.fa-xmark_gs {
+  cursor: pointer;
+}
+.groupSettingsSection_nameAndLogo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.img_wrapper_circle {
+  height: 150px;
+  width: 150px;
+  background-color: white;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#groupusersimg{
+  height: 80%;
+  width: 80%;
+  object-fit: cover;
+}
+.groupSettingsSection_name{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+  margin-top: 25px;
+}
+.fa-pen-edit{
+  font-size: 15px;
+  margin: 10px;
+}
+.fa-check-ok{
+  margin: 10px;
+  display: none;
+}
+.makeeditable{
+  border-bottom: 1px solid green;
+  width: 80%;
+  padding: 5px;
+  outline: none;
+}
+.groupSettingsSection_desc{
+  
+  border-top: 10px solid black;
+  border-bottom: 10px solid black;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* margin: 10px; */
+  margin-top: 25px;
+  padding: 15px;
+}
+.groupSettingsSection_userList_heading{
+  font-size: 15px;
+  color: #8796A1;
+  margin-left: 15px;
+}
+.addUsersToGroup{
+  /* border-top: 10px solid black; */
+  border-bottom: 10px solid black;
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+
+}
+/* 04A784 */
+.fa-user-plus-icondiv{
+  background-color: #04A784;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin-right: 20px;
+
+}
+.addUsersToGroup:hover{
+  background-color: #1f2c33;
+  cursor: pointer;
+}
+.fa-user-plus-icon{
+}
+.adduserbtntext{
+  margin: 0;
+
+}
+
+#groupSettingsSection_userListrole {
+  flex: 1;
+  font-size: 15px;
+}
+.groupSettingsSection_exitGroup{
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  padding: 10px 10px 10px 25px;
+}
+.fa-arrow-right-from-bracket_icon{
+  color: red;
+  margin-right: 20px;
+}
+.Exit_Group_text{
+  color: red;
+}
+
+
+
+/* modal to add members to group */
+
+.w3-modal-content{
+  width: 27%;
+
+}
+.w3-container{
+  background-color: #111A20;
+  color: white;
+  padding: 0 !important;
+}
+.modal_topbar{
+  display: flex;
+  align-items: center;
+  background-color: #1f2c33;
+  margin-bottom: 10px;
+  font-size: 15px;
+
+}
+
+.fa-xmark_modal_x{
+  margin: 0 15px;
+  cursor: pointer;
+}
+
+.modal_search{
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal_searchcont{
+  width: 95%;
+  background-color: #1f2c33;
+  border-radius: 5px;
+  padding: 8px;
+}
+.fa-magnifying-glass_modalicon{
+  color: #8796A1;
+  margin: 0 10px;
+}
+#searchUserText{
+  outline: none;
+  border: none;
+  width: 80%;
+  background-color: transparent;
+  color: white;
+font-size: 15px;
+}
+
+.modal_users{
+
 }

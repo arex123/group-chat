@@ -1,69 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <link rel="stylesheet" href="./css/chat.css" />
-  </head>
-  <body>
-    <section id="chatContainerSection">
-      <div class="chatDivContainer">
-        <div class="navigationMenu"></div>
 
-        <div class="chatSidebar">
-          <div class="chatSidebar__topbar">
-            <h2>Chats</h2>
-            <div class="vertical-dot-div">
-              <i class="fa-solid fa-ellipsis-vertical"></i>
-              <div class="vertical-dot-div__options">
-                <p class="openGCS" onclick="handleOpenGCS()">New Group</p>
-                <p onclick="handleLogOut()">Log out</p>
-              </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="./css/chat.css" />
+</head>
+
+<body>
+  <section id="chatContainerSection">
+    <div class="chatDivContainer">
+      <div class="navigationMenu"></div>
+
+      <div class="chatSidebar">
+        <div class="chatSidebar__topbar">
+          <h2>Chats</h2>
+          <div class="vertical-dot-div">
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+            <div class="vertical-dot-div__options">
+              <p class="openGCS" onclick="handleOpenGCS()">New Group</p>
+              <p onclick="handleLogOut()">Log out</p>
             </div>
           </div>
+        </div>
 
-          <div class="createGroupSection">
-
-            <div class="createGroupSection_top">
-              <div class="createGroupSection_topleft">
-
-                <i class="fa-solid fa-xmark" onclick="closeGCS()"></i>
-                <p>Add Group Members</p>
-              </div>
-
-              <!-- <i class="fa-solid fa-arrow-right nextSecGrp"></i> -->
+        <div class="createGroupSection">
+          <div class="createGroupSection_top">
+            <div class="createGroupSection_topleft">
+              <i class="fa-solid fa-xmark" onclick="closeGCS()"></i>
+              <p>Add Group Members</p>
             </div>
 
-            <div class="createGroupSection_namesearch">
-              <input type="text" id="newGroupName" placeholder="Enter Group Name">
-              <button class="createGrp" onclick="handleCreateGroup()">Create</button>
-            </div>
-
-            <div class="createGroupSection_userlistcont">
-
-              <div class="createGroupSection_userlist">
-                
-                
-              </div>
-              
-            </div>
-
+            <!-- <i class="fa-solid fa-arrow-right nextSecGrp"></i> -->
           </div>
-          <div class="chatSidebar__searchbar">
-            <i class="fa-solid fa-magnifying-glass"></i>
 
-            <input type="text" placeholder="Search" id="searchGroups" />
+          <div class="createGroupSection_namesearch">
+            <input type="text" id="newGroupName" placeholder="Enter Group Name" />
+            <button class="createGrp" onclick="handleCreateGroup()">
+              Create
+            </button>
           </div>
-          <div class="chatSidebar__grouplist">
-            <!-- <div class="groupItem" id="111">
+
+          <div class="createGroupSection_userlistcont">
+            <div class="createGroupSection_userlist"></div>
+          </div>
+        </div>
+        <div class="chatSidebar__searchbar">
+          <i class="fa-solid fa-magnifying-glass"></i>
+
+          <input type="text" placeholder="Search" id="searchGroups" />
+        </div>
+        <div class="chatSidebar__grouplist">
+          <!-- <div class="groupItem" id="111">
               <div class="groupItem_profileImgDiv">
                 <img
                   id="groupItem_profileImg"
@@ -85,25 +79,25 @@
               <p id="groupItem_profileName">Group 2</p>
               <p id="groupItem_profilePendingMsg">20</p>
             </div> -->
-          </div>
         </div>
+      </div>
 
-        <div class="contentArea">
-          <div class="contentDefaultConversation">
-            <i class="fa-brands fa-whatsapp"></i>
-            <p>Select group to view conversation</p>
-          </div>
-          <div class="contentConversation">
-            <div class="contentConversation_topbar">
-              <h5 class="groupname">Chats</h5>
-              <div class="groupexit">
-                <i class="fa-solid fa-right-from-bracket"></i>
-              </div>
+      <div class="contentArea">
+        <div class="contentDefaultConversation">
+          <i class="fa-brands fa-whatsapp"></i>
+          <p>Select group to view conversation</p>
+        </div>
+        <div class="contentConversation">
+          <div class="contentConversation_topbar">
+            <h5 class="groupname">Chats</h5>
+            <div class="groupSettings" onclick="handleToggleGroupSetting()">
+              <i class="fa-solid fa-ellipsis-vertical"></i>
             </div>
-            <div class="contentConversation_conversation">
-              <div class="scrollconversation">
-                <main class="msger-chat">
-                  <!-- <div class="msg left-msg">
+          </div>
+          <div class="contentConversation_conversation">
+            <div class="scrollconversation">
+              <main class="msger-chat">
+                <!-- <div class="msg left-msg">
                     <div
                       class="msg-img"
                       style="
@@ -144,7 +138,7 @@
                     </div>
                   </div> -->
 
-                  <!-- <div class="msg left-msg">
+                <!-- <div class="msg left-msg">
                     <div
                       class="msg-img"
                       style="
@@ -324,27 +318,91 @@
                       </div>
                     </div>
                   </div> -->
-                </main>
-              </div>
-            </div>
-            <div class="contentConversation_inputContainer">
-              <input
-                type="text"
-                placeholder="Type message"
-                id="messageToSend"
-              />
+              </main>
             </div>
           </div>
+          <div class="contentConversation_inputContainer">
+            <input type="text" placeholder="Type message" id="messageToSend" />
+          </div>
         </div>
+        <div class="groupSettingsSection">
+          <div class="groupSettingsSection_topbar">
+            <i class="fa-solid fa-xmark fa-xmark_gs" onclick="handleToggleGroupSetting()"></i>
+            <p>Group Info</p>
+          </div>
+
+          <div class="groupSettingsSection_nameAndLogo">
+            <div class="img_wrapper_circle">
+
+              <img id="groupusersimg" src="./images/groupusers.png" alt="">
+            </div>
+          </div>
+
+          <div class="groupSettingsSection_name">
+            <p class="groupSettingsSection_newname">name</p>
+            <i class="fa-solid fa-pen fa-pen-gname-edit fa-pen-edit" onclick="allowChangeGpSetting('name')"></i>
+            <i class="fa-solid fa-check fa-check-gname-ok fa-check-ok" onclick="submitChangeGpSetting('name')"></i>
+          </div>
+          <div class="groupSettingsSection_desc">
+
+            <p class="groupSettingsSection_newgname">welcome to my group</p>
+            <i class="fa-solid fa-pen fa-pen-gdesc-edit fa-pen-edit" onclick="allowChangeGpSetting('desc')"></i>
+            <i class="fa-solid fa-check fa-check-gdesc-ok fa-check-ok" onclick="submitChangeGpSetting('desc')"></i>
+
+          </div>
+
+          <div class="groupSettingsSection_userList">
+            <p class="groupSettingsSection_userList_heading">users</p>
+            <div class="addUsersToGroup" onclick="document.getElementById('id01').style.display='block'">
+              <div class="fa-user-plus-icondiv">
+
+                <i class="fa-solid fa-user-plus fa-user-plus-icon"></i>
+              </div>
+              <p class="adduserbtntext">Add Members</p>
+
+            </div>
+
+            <div id="id01" class="w3-modal">
+              <div class="w3-modal-content w3-animate-zoom w3-card-4">
+
+                <div class="w3-container">
+                  <div class="modal_topbar">
+                    <i onclick="document.getElementById('id01').style.display='none'"  class="fa-solid fa-xmark fa-xmark_modal_x"></i>
+                    <p class="modal_topbar_p">Add Mmbers</p>
+                  </div>
+                  <div class="modal_search">
+                    <div class="modal_searchcont">
+                      <i class="fa-solid fa-magnifying-glass fa-magnifying-glass_modalicon"></i>
+                      <input id="searchUserText" type="text" placeholder="Search name, phone or email"
+                        autocomplete="off" />
+                    </div>
+                  </div>
+                  <div class="modal_users">
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="groupSettingsSection_userList_users">
+
+          </div>
+          <div class="groupSettingsSection_exitGroup">
+            <i class="fa-solid fa-arrow-right-from-bracket fa-arrow-right-from-bracket_icon"></i>
+            <p class="Exit_Group_text">Exit Group</p>
+          </div>
+        </div>
+
       </div>
-    </section>
-   
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.3/axios.min.js"
-      integrity="sha512-zJXKBryKlsiDaWcWQ9fuvy50SG03/Qc5SqfLXxHmk9XiUUbcD9lXYjHDBxLFOuZSU6ULXaJ69bd7blSMEgxXNQ=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <script src="./js/chat.js"></script>
-  </body>
+    </div>
+    </div>
+  </section>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.3/axios.min.js"
+    integrity="sha512-zJXKBryKlsiDaWcWQ9fuvy50SG03/Qc5SqfLXxHmk9XiUUbcD9lXYjHDBxLFOuZSU6ULXaJ69bd7blSMEgxXNQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="./js/chat.js"></script>
+</body>
+
 </html>

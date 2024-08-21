@@ -16,5 +16,9 @@ router.get('/getUserGroups',authenticate,groupController.getUserGroups)
 
 router.get('/getGroupMessages/:id',authenticate,groupController.getGroupMessages)
 
+router.get('/groupInfo/:id',groupController.groupInfo)
+
+
+
 
 module.exports = router

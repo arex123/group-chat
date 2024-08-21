@@ -40,6 +40,7 @@ async function handleOpenGCS() {
 }
 function closeGCS() {
   //removing checks if user selected
+  document.querySelector(".createGroupSection_userlist").innerHTML=''
   const ItemElements = document.querySelectorAll(".userItems");
   for (let i = 0; i < ItemElements.length; i++) {
     if (ItemElements[i].classList.contains("selectedUser")) {
@@ -74,6 +75,10 @@ document.querySelector(".chatSidebar__grouplist").onclick = (e) => {
   if (e.target.closest(".groupItem")) {
     const groupItemElement = e.target.closest(".groupItem");
 
+    if(groupItemElement.id==selectedGroup?.id){
+      return
+    }
+
     if (selectedGroup != "" && selectedGroup?.id != groupItemElement.id) {
       selectedGroup.classList.toggle("selectedUser");
 
@@ -81,8 +86,10 @@ document.querySelector(".chatSidebar__grouplist").onclick = (e) => {
       document.querySelector('.msger-chat').innerHTML=''
 
     }
-    selectedGroup = groupItemElement;
+    // if(selectedGroup = "")
     groupItemElement.classList.toggle("selectedUser");
+
+    selectedGroup = groupItemElement;
 
     // console.log("yes" , groupItemElement.id,groupItemElement)
     // console.log("yes ",groupItemElement.querySelector('#groupItem_profileName').textContent)
@@ -385,3 +392,104 @@ function handleLogOut() {
   localStorage.clear();
   window.location.href = "/login";
 }
+
+
+function handleToggleGroupSetting(){
+  console.log("fdfs")
+  let gss = document.querySelector('.groupSettingsSection')
+  
+  if(gss.classList.contains('groupSettingsSection_open')==false){
+    //get groups users from backend 
+
+    
+
+    let tempuser = {
+      id:"2",
+      name:"user",
+      phone:"1243432452",
+      role:"member"
+    }
+    addUserToGroupListScreen(tempuser)
+    addUserToGroupListScreen(tempuser)
+    addUserToGroupListScreen(tempuser)
+    addUserToGroupListScreen(tempuser)
+    addUserToGroupListScreen(tempuser)
+    addUserToGroupListScreen(tempuser)
+    addUserToGroupListScreen(tempuser)
+  }
+  gss.classList.toggle('groupSettingsSection_open')
+
+}
+
+function allowChangeGpSetting(type){
+  if(type=='name'){
+
+    document.querySelector('.fa-pen-gname-edit').style.display='none'
+    document.querySelector('.fa-check-gname-ok').style.display='block'
+    
+    document.querySelector('.groupSettingsSection_newname').contentEditable=true
+    document.querySelector('.groupSettingsSection_newname').classList.toggle("makeeditable")
+  }else if(type=='desc'){
+
+    document.querySelector('.fa-pen-gdesc-edit').style.display='none'
+    document.querySelector('.fa-check-gdesc-ok').style.display='block'
+    
+    document.querySelector('.groupSettingsSection_newgname').contentEditable=true
+    document.querySelector('.groupSettingsSection_newgname').classList.toggle("makeeditable")
+    
+  }
+}
+function submitChangeGpSetting(type){
+  
+  if(type=='name'){
+    
+    //call backend to update group name    
+    document.querySelector('.fa-pen-gname-edit').style.display='block'
+    document.querySelector('.fa-check-gname-ok').style.display='none'
+    document.querySelector('.groupSettingsSection_newname').contentEditable=false
+    document.querySelector('.groupSettingsSection_newname').classList.toggle("makeeditable")
+  }else if(type=='desc'){
+    document.querySelector('.fa-pen-gdesc-edit').style.display='block'
+    document.querySelector('.fa-check-gdesc-ok').style.display='none'
+    
+    document.querySelector('.groupSettingsSection_newgname').contentEditable=false
+    document.querySelector('.groupSettingsSection_newgname').classList.toggle("makeeditable")
+
+  }
+
+}
+
+function addUserToGroupListScreen(user) {
+  console.log("u: ", user);
+  let userId = user.id
+  let name = user.name
+  let phone = user.phone
+  let role = user.role
+
+  let ItemToAdd = `<div class="groupItem userItems" id='${user.id}'>
+              <div class="groupItem_profileImgDiv">
+                <img
+                  id="groupItem_profileImg"
+                  src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQAtAMBIgACEQEDEQH/xAAbAAEAAgMBAQAAAAAAAAAAAAAABAUBAwYCB//EADEQAQACAQIEBAIJBQAAAAAAAAABAgMEEQUhMUESUWFxEyIUIzI0QlKBkcEzYqGi0f/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwD6SAAAAAAB3AO/VYabhlrxFs8zjj8sdVlh0+HDG2PHEevcFDTDlv8AYx3n1iHqdLnr1w3/AGdEA5e0TWdrRNZ8pg7untWLRtaImJ80LPw3Dff4f1dvToClG3UafLp7RGSu2/Se0tQAAAAAAAAAAAAAAHPtG660GhjBHxMkROXt5VRuE6aLW+Pb8M7V/wCraOgMgAAAAA8ZcdctJpeu9Z7KLWaW2lybRzrbpb+HQNWow1z4ppbv0nykHODN6zjvaluU1naWAAAAAAAAAAACI36Dfoa+PV4o/u3Be4McYcNMcfhjZsAAAAAAAAAFPxfF4ctckfjjafeFeuuLV8Wk3/LaJUoAAAAAAAAAACTw377j/VGbdLf4epx2nlEWjcHRjEMgAAAAAAAAh8U+5394Ua44xfbBSne07/pCnAAAAAAAAAAAPfoAL/QZ/jaatp+1Hy290lQaDU/Rsvzc6W5W9F9ExMRMc4kGQAAAAAAQ+I6r6Pj8NP6lunp6greJZvjamfDPy0+WEUAAAAAAAAAAAAAE3Q66cH1eSZnHP+qEm6Xh2TNHiy746e3OQXNL1vWLUtExPeHpqwYMeCvhxV8Md/VtAAAABE1mtpgjau1snaN+nupMl7ZLze/O09ZW+q4bjyzNsfyXn9YlVZsOTDfw5K7eoNYAAAAAAAAAAAD1Slsl4pSszaezOLFfNkimOIm0/wCPVe6PTU01PDXnaftW8watHw+mHa+Ta+Tz7QmgAAAAAAA8ZcVM1JpkrFqz2ewFFrdDfT/PSZvTz25wiezp5jkqOIaL4W+XDG9es18gV4AAAAAAADMRNrRWI3meUQx3WXCNPvM57R05V/kEzQ6WNNj2nneftSlAAAAAAAAAAAAxMbwyAo+IaT6Pfx0jbHbpHlKG6TPirmx2x26TDnclJx5LUt1rPMHkAAAAADaZ5R1mdodJgxRiw1pHaFHw6nj1lI8vm/Z0AAAAAAAAAAAAAAACn4xh8OWmSOluU+8LhE4nj8ektPevzAogAAAAAWHBo3zZJ8qrgAAAAAAAAAAAAAAAGvNETivE9JiQBzYAAAP/2Q=="
+                  alt="img"
+                />
+              </div>
+              <p id="groupItem_profileName">${user.name}</p>
+              <p id="groupSettingsSection_userListrole">${role}</p>
+            </div>`;
+
+  let List = document.querySelector(".groupSettingsSection_userList_users");
+
+  List.insertAdjacentHTML("beforeend", ItemToAdd);
+}
+
+
+// function handleShowModal(){
+
+//   document.getElementById('id01').style.display='block'
+// }
+
+// function handlehideModal(){
+// console.log("re mo",document.getElementById('id01').style.display='none')
+//   document.getElementById('id01').style.display='none'
+// }

@@ -16,6 +16,7 @@ const groupRoutes = require('./routes/group')
 const User = require('./models/user');
 const Chat = require('./models/chat');
 const Group = require('./models/group');
+const UserGroup = require('./models/usergroup');
 
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname,'public')))
@@ -44,8 +45,8 @@ app.use((req,res) => {
 User.hasMany(Chat)
 Chat.belongsTo(User)
 
-User.belongsToMany(Group,{through:'UserGroup'})
-Group.belongsToMany(User,{through:'UserGroup'})
+User.belongsToMany(Group,{through:UserGroup})
+Group.belongsToMany(User,{through:UserGroup})
 
 
 Group.hasMany(Chat)
@@ -54,6 +55,7 @@ Chat.belongsTo(Group)
 sequelize
 .sync()
 // .sync({force:true})
+// .sync({alter:true})
 .then(()=>{
     app.listen(process.env.PORT,()=>{
         console.log(`Server running at port ${process.env.PORT}`)
