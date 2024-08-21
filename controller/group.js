@@ -1,8 +1,9 @@
-const { where, Op } = require("sequelize");
+const { where, Op, Model } = require("sequelize");
 const Group = require("../models/group");
 const User = require("../models/user");
 const UserGroup = require("../models/usergroup");
 const Chat = require("../models/chat");
+const sequelize = require("../utils/database");
 
 exports.createGroup = async (req, res, next) => {
   console.log(
@@ -126,7 +127,7 @@ exports.groupInfo = async (req, res, next) => {
   try {
     let groupId = req.params.id;
 
-    let results = await Group.findOne({
+    let groupDetail = await Group.findOne({
       where: {
         id: groupId,
       },
@@ -135,9 +136,8 @@ exports.groupInfo = async (req, res, next) => {
         {
           model: User,
           where: {
-            // [Op.not] : req.user.id
             id: {
-              [Op.not]: "7",
+              [Op.not]: req.user.id,
             },
           },
           attributes: ["id", "name", "phone", "email"],
@@ -147,22 +147,36 @@ exports.groupInfo = async (req, res, next) => {
       order: [[User, UserGroup, "role", "ASC"]],
     });
 
-    // let users = await UserGroup.findAll({
-    //   where:{
-    //     groupId:groupId
-    //   },
-    //   include:[
-    //     {
-    //       model:User,
-    //       attributes:['id','name']
-    //     },
-    //     {
-    //       model:Group,
-    //       attributes:['id','groupName','groupDescription']
-    //     }
-    //   ]
-    // })
-    res.json(results);
+    let currUserCreatorCheck = await Group.findOne({
+      where: {
+        id: groupId,
+        groupOwnerId: req.user.id,
+      },
+    });
+    let isCreator = true;
+    if (!currUserCreatorCheck) {
+      isCreator = false;
+    }
+
+    let currUserAdminCheck = await UserGroup.findOne({
+      where: {
+        userId: req.user.id,
+        groupId: groupId,
+        role: "admin",
+      },
+    });
+
+    let isAdmin = true;
+    if (!currUserAdminCheck) {
+      isAdmin = false;
+    }
+
+    res.json({
+      groupDetail,
+      isCreator,
+      isAdmin,
+      currUser: req.user,
+    });
   } catch (err) {
     console.error("Error while getting users of current group ", err);
     res
@@ -170,3 +184,248 @@ exports.groupInfo = async (req, res, next) => {
       .json({ error: "Error while getting users of current group" });
   }
 };
+
+exports.updateGroupNameOrDesc = async (req, res, next) => {
+  try {
+    //check if user is admin
+    let isEligible = await isUserAdmin(req.user.id, req.body.groupId);
+    if (!isEligible) {
+      throw new Error("Members can't update group name");
+    }
+
+    let filedToUpdate = "";
+    let newText = "";
+    if (req.body.groupName) {
+      filedToUpdate = "groupName";
+      newText = req.body.groupName;
+    } else {
+      filedToUpdate = "groupDescription";
+      newText = req.body.groupDescription;
+    }
+
+    let [affectedRows] = await Group.update(
+      {
+        [filedToUpdate]: newText,
+      },
+      {
+        where: {
+          id: req.body.groupId,
+        },
+      }
+    );
+
+    if (affectedRows > 0) {
+      res.json({ success: true });
+    } else {
+      throw new Error("Group not found or something else went wrong");
+    }
+  } catch (error) {
+    console.log("err while updating group name or desc ", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.makeAdmin = async (req, res, next) => {
+  try {
+    //check if user is admin
+    let isEligible = await isUserAdmin(req.user.id, req.body.groupId);
+    console.info("iseligible ", isEligible);
+
+    if (!isEligible) {
+      throw new Error("Members can't make admin");
+    }
+
+    let [affectedRows] = await UserGroup.update(
+      { role: "admin" },
+      {
+        where: {
+          userId: req.body.userId,
+          groupId: req.body.groupId,
+        },
+      }
+    );
+
+    console.log("afeecte ", affectedRows);
+
+    if (affectedRows > 0) {
+      res.json({ success: true });
+    } else {
+      throw new Error("User not found in the group or could not be made admin");
+    }
+  } catch (error) {
+    console.log("err while creating new admin ", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+async function isUserAdmin(uid, gid) {
+  try {
+    let result = await UserGroup.findOne({
+      where: {
+        userId: uid,
+        groupId: gid,
+        role: "admin",
+      },
+    });
+
+    if (result) {
+      return true;
+    }
+    return false;
+  } catch (err) {
+    return false;
+  }
+}
+
+exports.removeMember = async (req, res, next) => {
+  try {
+    //check if user is admin
+    let isEligible = await isUserAdmin(req.user.id, req.body.groupId);
+    console.info("iseligible ", isEligible);
+
+    if (!isEligible) {
+      throw new Error("Members can't remove members");
+    }
+
+    let [affectedRows] = await UserGroup.destroy({
+      where: {
+        userId: req.body.userId,
+        groupId: req.body.groupId,
+      },
+    });
+
+    console.log("afeecte ", affectedRows);
+
+    if (affectedRows > 0) {
+      res.json({ success: true });
+    } else {
+      throw new Error("User not found in the group or could not be removed");
+    }
+  } catch (error) {
+    console.log("err while removing user from group ", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.usersOutsideGroup = async (req, res, next) => {
+  try {
+    let groupId = req.params.groupId;
+
+    const usersNotInGroup = await User.findAll({
+      attributes: ['id', 'name', 'email', 'phone'],
+      include: [
+        {
+          model: Group,
+          attributes: [],
+          where: { id: groupId },
+          through: { attributes: [] },
+          required: false, // LEFT JOIN
+        }
+      ],
+      where: {
+        '$Groups.id$': {
+          [Op.is]: null // Users not in the specified group
+        }
+      }
+    });
+
+    res.json(usersNotInGroup);
+  } catch (error) {
+    console.error("error while getting users outside current group");
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+exports.deleteGroup = async(req,res,next)=>{
+  const t = await sequelize.transaction()
+  try {
+    let groupId = req.params.groupId
+    //check if user is admin
+    let isEligible = await isUserAdmin(req.user.id,groupId);
+    console.info("iseligible ", isEligible);
+
+    if (!isEligible) {
+      throw new Error("Members can't delete group");
+    }
+
+
+
+    let delGrp = await Group.destroy({
+      where: {
+        id:groupId
+      },
+      transaction:t
+    });
+
+    console.log("delGrp ", delGrp);
+
+    if(delGrp==0){
+      throw new Error("Group not found")
+    }
+
+    await UserGroup.destroy({
+      where:{
+        groupId:groupId
+      },
+      transaction:t
+    })
+
+    await t.commit()
+    res.json({ success: true });
+    
+  } catch (error) {
+    await t.rollback()
+    console.log("err while deleting the group ", error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+exports.leaveGroup = async (req,res,next)=>{
+  try{
+    //check if user is admin and only admin
+
+    let groupId = req.body.groupId
+    let userId = req.user.id
+
+    let isAdmin = await UserGroup.findOne({
+      where:{
+        userId,
+        groupId,
+        role:'admin'
+      }
+    })
+
+    console.log("checking is admin ",isAdmin)
+
+    if(isAdmin){
+      //check if he is only admin
+      let adminCounts = await UserGroup.count({
+        where:{
+          groupId,
+          role:'admin' 
+        }
+      })
+
+      console.log("total number of admin ",adminCounts)
+
+      if(adminCounts==1){
+        throw new Error("Please Delete the group before leaving")
+      }
+
+    }
+    
+    await UserGroup.destroy({
+      where:{
+        userId,
+        groupId
+      }
+    })
+
+    res.json({success:true})
+
+
+  }catch(error){
+    res.status(500).json({error:error.message})
+  }
+}
