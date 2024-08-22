@@ -353,7 +353,7 @@
 
           <div class="groupSettingsSection_userList">
             <p class="groupSettingsSection_userList_heading">users</p>
-            <div class="addUsersToGroup" onclick="document.getElementById('id01').style.display='block'">
+            <div class="addUsersToGroup" onclick="handleAddMember()">
               <div class="fa-user-plus-icondiv">
 
                 <i class="fa-solid fa-user-plus fa-user-plus-icon"></i>
@@ -373,7 +373,7 @@
                   <div class="modal_search">
                     <div class="modal_searchcont">
                       <i class="fa-solid fa-magnifying-glass fa-magnifying-glass_modalicon"></i>
-                      <input id="searchUserText" type="text" placeholder="Search name, phone or email"
+                      <input id="searchUserText" type="text" onchange="handleNewUserSearch(this.value)" placeholder="Search name, phone or email"
                         autocomplete="off" />
                     </div>
                   </div>
@@ -390,7 +390,7 @@
           </div>
           <div class="groupSettingsSection_exitGroup">
             <i class="fa-solid fa-arrow-right-from-bracket fa-arrow-right-from-bracket_icon"></i>
-            <p class="Exit_Group_text">Exit Group</p>
+            <p class="Exit_Group_text" onclick="handleExit()">Exit Group</p>
           </div>
         </div>
 

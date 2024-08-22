@@ -10,7 +10,7 @@ const groupController = require('../controller/group')
 
 router.post('/createGroup',authenticate, groupController.createGroup)
 
-router.post('/addUserToGroup',authenticate,groupController.addUserToGroup)
+// router.post('/addUserToGroup',authenticate,groupController.addUserToGroup)
 
 router.get('/getUserGroups',authenticate,groupController.getUserGroups)
 
@@ -21,6 +21,8 @@ router.get('/groupInfo/:id',authenticate,groupController.groupInfo)
 router.post('/updateGroupNameOrDesc',authenticate,groupController.updateGroupNameOrDesc)
 
 router.post('/makeAdmin',authenticate,groupController.makeAdmin)
+
+router.post('/removeMember',authenticate,groupController.removeMember)
 
 router.get('/:groupId/usersOutsideGroup',authenticate,groupController.usersOutsideGroup)
 

@@ -131,7 +131,7 @@ body {
 .chatSidebar__topbar h2 {
   margin: 0;
 }
-.vertical-dot-div {
+.vertical-dot-div ,div[class^="vertical-dot-div_gs"]{
   display: flex;
   justify-content: center;
   align-items: center;
@@ -142,12 +142,16 @@ body {
   position: relative;
   z-index: 1000;
 }
-.vertical-dot-div:hover {
+div[class^="vertical-dot-div_gs"]{
+  margin-left: 5px;
+  z-index: 0;
+}
+.vertical-dot-div:hover,div[class^="vertical-dot-div_gs"]:hover {
   background-color: #233138;
   /* color: #111A20; */
 }
 
-.vertical-dot-div__options {
+.vertical-dot-div__options{
   background-color: #233138;
   position: absolute;
   top: 50px;
@@ -160,14 +164,27 @@ body {
 }
 
 .active {
-  display: block;
+  display: block !important;
 }
 
-.vertical-dot-div__options p {
+div[class^="vertical-dot-div__options_gs"]{
+  background-color: #233138;
+  position: absolute;
+  top: 50px;
+  right: 0;
+  font-size: 12px;
+  width: 120px;
+  border-radius: 4px;
+  user-select: none;
+  /* z-index: 2000; */
+  top: 38px;
+  display: none;
+}
+.vertical-dot-div__options p,div[class^="vertical-dot-div__options_gs"] p {
   padding: 10px;
   padding-left: 20px;
 }
-.vertical-dot-div__options p:hover {
+.vertical-dot-div__options p:hover ,div[class^="vertical-dot-div__options_gs"] p:hover{
   background-color: #111a20;
 }
 .contentArea {
@@ -286,7 +303,7 @@ body {
   margin-top: 5px;
   overflow-y: scroll;
 }
-.groupItem {
+.groupItem ,.groupItem1{
   display: flex;
   color: white;
   align-items: center;
@@ -509,7 +526,7 @@ body {
 
 }
 
-#groupSettingsSection_userListrole {
+p[class^="groupSettingsSection_userListrole"] {
   flex: 1;
   font-size: 15px;
 }
@@ -525,6 +542,7 @@ body {
 }
 .Exit_Group_text{
   color: red;
+  cursor: pointer;
 }
 
 
@@ -579,6 +597,18 @@ body {
 font-size: 15px;
 }
 
-.modal_users{
-
+.modelUser{
+  font-size: 15px;
+  margin: 10px;
+}
+.modelUserImg{
+  margin-right: 10px;
+}
+.modelUser-info{
+  color: #53616A;
+  font-size: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  align-items: end;
 }

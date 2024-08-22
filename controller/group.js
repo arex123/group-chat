@@ -46,32 +46,32 @@ exports.createGroup = async (req, res, next) => {
   }
 };
 
-exports.addUserToGroup = async (req, res, next) => {
-  console.log("add user to group method");
+// exports.addUserToGroup = async (req, res, next) => {
+//   console.log("add user to group method");
 
-  let { userToAdd, groupId } = req.body;
+//   let { userToAdd, groupId } = req.body;
 
-  try {
-    let isAdmin = await UserGroup.findOne({
-      where: {
-        userId: req.user.id,
-        role: "admin",
-        groupId: groupId,
-      },
-    });
-    if (!isAdmin) {
-      res.status(403).json({
-        error: "You do not have permission to add users to this group",
-      });
-    }
+//   try {
+//     let isAdmin = await UserGroup.findOne({
+//       where: {
+//         userId: req.user.id,
+//         role: "admin",
+//         groupId: groupId,
+//       },
+//     });
+//     if (!isAdmin) {
+//       res.status(403).json({
+//         error: "You do not have permission to add users to this group",
+//       });
+//     }
 
-    await UserGroup.create({ userId: userToAdd, groupId: groupId });
-    res.status(200).json({ message: "User added to group successfully" });
-  } catch (err) {
-    console.error("err while adding new user to group", err);
-    res.status(500).json({ error: "Failed to add user to group" });
-  }
-};
+//     await UserGroup.create({ userId: userToAdd, groupId: groupId });
+//     res.status(200).json({ message: "User added to group successfully" });
+//   } catch (err) {
+//     console.error("err while adding new user to group", err);
+//     res.status(500).json({ error: "Failed to add user to group" });
+//   }
+// };
 
 exports.getUserGroups = async (req, res, next) => {
   console.log("getting user group");
@@ -227,6 +227,7 @@ exports.updateGroupNameOrDesc = async (req, res, next) => {
 
 exports.makeAdmin = async (req, res, next) => {
   try {
+    console.log("req,bo dy ",req.body)
     //check if user is admin
     let isEligible = await isUserAdmin(req.user.id, req.body.groupId);
     console.info("iseligible ", isEligible);
@@ -281,13 +282,13 @@ exports.removeMember = async (req, res, next) => {
   try {
     //check if user is admin
     let isEligible = await isUserAdmin(req.user.id, req.body.groupId);
-    console.info("iseligible ", isEligible);
+    console.info("iseligible ", isEligible,req.body);
 
     if (!isEligible) {
       throw new Error("Members can't remove members");
     }
 
-    let [affectedRows] = await UserGroup.destroy({
+    let affectedRows = await UserGroup.destroy({
       where: {
         userId: req.body.userId,
         groupId: req.body.groupId,
