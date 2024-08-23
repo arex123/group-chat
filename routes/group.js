@@ -10,7 +10,7 @@ const groupController = require('../controller/group')
 
 router.post('/createGroup',authenticate, groupController.createGroup)
 
-// router.post('/addUserToGroup',authenticate,groupController.addUserToGroup)
+router.post('/addUserToGroup',authenticate,groupController.addUserToGroup)
 
 router.get('/getUserGroups',authenticate,groupController.getUserGroups)
 
@@ -29,5 +29,6 @@ router.get('/:groupId/usersOutsideGroup',authenticate,groupController.usersOutsi
 router.delete('/deleteGroup/:groupId',authenticate,groupController.deleteGroup)
 
 router.post('/leaveGroup',authenticate,groupController.leaveGroup)
+
 
 module.exports = router

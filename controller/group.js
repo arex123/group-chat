@@ -6,6 +6,7 @@ const Chat = require("../models/chat");
 const sequelize = require("../utils/database");
 
 exports.createGroup = async (req, res, next) => {
+  let t = await sequelize.transaction()
   console.log(
     "req body : ",
     req.body,
@@ -19,13 +20,13 @@ exports.createGroup = async (req, res, next) => {
       groupName: req.body.name,
       groupOwnerId: req.user.id,
       groupOwnerName: req.user.name,
-    });
+    },{transaction:t});
 
     await UserGroup.create({
       userId: req.user.id,
       groupId: newGroup.id,
       role: "admin",
-    });
+    },{transaction:t});
 
     //create rest of users as member
 
@@ -34,44 +35,57 @@ exports.createGroup = async (req, res, next) => {
         userId: id,
         groupId: newGroup.id,
         role: "member",
-      });
+      },
+    {transaction:t});
     }
 
+    await t.commit()
     res
       .status(201)
       .json({ success: true, message: "Group created successfully", newGroup });
   } catch (err) {
+    await t.rollback()
     console.error("erro while creating group", err);
     res.status(500).json({ error: "Failed to create group" });
   }
 };
 
-// exports.addUserToGroup = async (req, res, next) => {
-//   console.log("add user to group method");
+exports.addUserToGroup = async (req, res, next) => {
+  console.log("add user to group method",req.body);
 
-//   let { userToAdd, groupId } = req.body;
+  let { usersToAdd, groupId } = req.body;
 
-//   try {
-//     let isAdmin = await UserGroup.findOne({
-//       where: {
-//         userId: req.user.id,
-//         role: "admin",
-//         groupId: groupId,
-//       },
-//     });
-//     if (!isAdmin) {
-//       res.status(403).json({
-//         error: "You do not have permission to add users to this group",
-//       });
-//     }
+  try {
+    let isAdmin = await UserGroup.findOne({
+      where: {
+        userId: req.user.id,
+        role: "admin",
+        groupId: groupId,
+      },
+    });
+    if (!isAdmin) {
+      res.status(403).json({
+        error: "You do not have permission to add users to this group",
+      });
+    }
 
-//     await UserGroup.create({ userId: userToAdd, groupId: groupId });
-//     res.status(200).json({ message: "User added to group successfully" });
-//   } catch (err) {
-//     console.error("err while adding new user to group", err);
-//     res.status(500).json({ error: "Failed to add user to group" });
-//   }
-// };
+    // await UserGroup.create({ userId: userToAdd, groupId: groupId });
+
+    for (let id of usersToAdd) {
+      console.log("id ",id)
+      await UserGroup.create({
+        userId: id,
+        groupId: groupId,
+        role: "member",
+      });
+    }
+
+    res.status(200).json({ message: "User added to group successfully" });
+  } catch (err) {
+    console.error("err while adding new user to group", err);
+    res.status(500).json({ error: "Failed to add user to group" });
+  }
+};
 
 exports.getUserGroups = async (req, res, next) => {
   console.log("getting user group");
@@ -142,6 +156,7 @@ exports.groupInfo = async (req, res, next) => {
           },
           attributes: ["id", "name", "phone", "email"],
           through: { attributes: ["role"] },
+          required:false
         },
       ],
       order: [[User, UserGroup, "role", "ASC"]],

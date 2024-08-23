@@ -83,9 +83,14 @@ document.querySelector(".chatSidebar__grouplist").onclick = (e) => {
     if (groupItemElement.id == selectedGroup?.id) {
       return;
     }
+    // if(selectedGroup!=""){
+    //   handleToggleGroupSetting()
+    // }
+    
 
     if (selectedGroup != "" && selectedGroup?.id != groupItemElement.id) {
       selectedGroup.classList.toggle("selectedUser");
+      handleToggleGroupSettingClose()
 
       //
       document.querySelector(".msger-chat").innerHTML = "";
@@ -341,6 +346,7 @@ async function getGroupMessages(id) {
     console.log("msf ", messages);
     // let groupsOwnerId = selectedGroup.getAttribute('ukey')
     // document.querySelector('.msger-chat').innerHTML=''
+    document.querySelector(".msger-chat").innerHTML=''
     messages.data.messages.forEach((msg) =>
       appendMessage(
         msg.messageOwner,
@@ -359,8 +365,10 @@ async function handleCreateGroup() {
   // e.preventDefault()
 
   let groupName = document.getElementById("newGroupName").value;
+  if(groupName.length==0){
+    groupName = "new group"
+  }
   console.log("Creating group", groupName, selectedUserForGroup);
-
   try {
     console.log("toe ", token);
 
@@ -387,11 +395,11 @@ async function handleCreateGroup() {
       getUserGroupNames();
     }
   } catch (err) {
-    if (err.response.status == 401) {
+    console.log("err while creating group: ", err);
+    if (err.response?.status == 401) {
       window.location.href = "/login";
       localStorage.clear();
     }
-    console.log("err while creating group: ", err);
     alert("Something went Wrong, Retry Again after some time");
     // modal.style.display = "none";
   }
@@ -401,7 +409,11 @@ function handleLogOut() {
   localStorage.clear();
   window.location.href = "/login";
 }
+function handleToggleGroupSettingClose(){
 
+  let gss = document.querySelector(".groupSettingsSection");
+  gss.classList.remove("groupSettingsSection_open");
+}
 async function handleToggleGroupSetting() {
   console.log("fdfs");
   let gss = document.querySelector(".groupSettingsSection");
@@ -409,56 +421,62 @@ async function handleToggleGroupSetting() {
   if (gss.classList.contains("groupSettingsSection_open") == false) {
     //get groups users from backend
 
-    try {
-      console.log("selectedGroup.id", selectedGroup.id);
+    await gettingGroupInfo()
 
-      let result = await axios.get(
-        serverURL + `/group/groupInfo/${selectedGroup.id}`,
-        jwt
-      );
-
-      let { currUser, groupDetail, isAdmin, isCreator } = result.data;
-      let { groupDescription, groupName, createdAt, users } = groupDetail;
-
-      console.log("res", result);
-
-      groupDescription = groupDescription ?? "des";
-
-      document.querySelector(".groupSettingsSection_newname").textContent =
-        groupName;
-      document.querySelector(".groupSettingsSection_newgname").textContent =
-        groupDescription;
-
-        if(!isAdmin){
-          //disable name and desc editing
-          document.querySelector('.fa-pen-gname-edit').style.display='none'
-          document.querySelector('.fa-pen-gdesc-edit').style.display='none'
-          document.querySelector('.groupSettingsSection_userList').style.display='none'
-        }
-
-        document.querySelector(".groupSettingsSection_userList_users").innerHTML=''
-      addUserToGroupListScreen(
-        currUser.id,
-        "You",
-        currUser.phone,
-        isAdmin == true ? "admin" : "member"
-      );
-      let isCurrAdmin = isAdmin;
-      users.forEach((user) =>
-        addUserToGroupListScreen(
-          user.id,
-          user.name,
-          user.phone,
-          user.UserGroup.role,
-          isCurrAdmin
-        )
-      );
-      // addUserToGroupListScreen(tempuser)
-    } catch (err) {
-      console.log("error while fetching grp det", err);
-    }
   }
   gss.classList.toggle("groupSettingsSection_open");
+}
+
+async function gettingGroupInfo(){
+
+  try {
+    console.log("selectedGroup.id", selectedGroup.id);
+
+    let result = await axios.get(
+      serverURL + `/group/groupInfo/${selectedGroup.id}`,
+      jwt
+    );
+
+    console.log("res", result);
+    let { currUser, groupDetail, isAdmin, isCreator } = result.data;
+    let { groupDescription, groupName, createdAt, users } = groupDetail;
+
+
+    groupDescription = groupDescription ?? "des";
+
+    document.querySelector(".groupSettingsSection_newname").textContent =
+      groupName;
+    document.querySelector(".groupSettingsSection_newgname").textContent =
+      groupDescription;
+
+      if(!isAdmin){
+        //disable name and desc editing
+        document.querySelector('.fa-pen-gname-edit').style.display='none'
+        document.querySelector('.fa-pen-gdesc-edit').style.display='none'
+        document.querySelector('.groupSettingsSection_userList').style.display='none'
+      }
+
+      document.querySelector(".groupSettingsSection_userList_users").innerHTML=''
+    addUserToGroupListScreen(
+      currUser.id,
+      "You",
+      currUser.phone,
+      isAdmin == true ? "admin" : "member"
+    );
+    let isCurrAdmin = isAdmin;
+    users.forEach((user) =>
+      addUserToGroupListScreen(
+        user.id,
+        user.name,
+        user.phone,
+        user.UserGroup.role,
+        isCurrAdmin
+      )
+    );
+    // addUserToGroupListScreen(tempuser)
+  } catch (err) {
+    console.log("error while fetching grp det", err);
+  }
 }
 
 function allowChangeGpSetting(type) {
@@ -672,8 +690,15 @@ async function handleExit(){
     
     console.log(res)
 
+    await getUserGroupNames()
+    document.querySelector(".contentDefaultConversation").style.display =
+    "flex";
+  document.querySelector(".contentConversation").style.display = "none";
+    handleToggleGroupSettingClose()
+    selectedGroup=''
+
   }catch(err){
-    alert("semething went wrong ",err.message)
+    alert(err.response.data.error)
     console.log("ee ",err)
   }
 }
@@ -692,7 +717,44 @@ async function handleAddMember() {
 
     document.querySelector(".modal_users").innerHTML='';
 
+    selectedUserForGroup = []
+
     tempData.forEach(user=>addUserToModalScreen(user))
+
+
+    document.querySelector('#searchUserText').addEventListener('input',function(){
+      let newval = this.value.toLowerCase().trim()
+      console.log("val ",newval)
+      let tempUserCopy = [...users]
+      let newTempUser = []
+      
+      newTempUser = tempUserCopy.filter(user=>user.name.includes(newval))
+      if(newTempUser.length==0){
+        newTempUser = tempUserCopy.filter(user=>user.email.includes(newval))
+      }
+      if(newTempUser.length==0){
+        newTempUser = tempUserCopy.filter(user=>user.phone.includes(newval))
+      }
+
+    let modalUserList =  document.querySelector(".modal_users")
+    modalUserList.innerHTML='';
+
+    if(newTempUser.length==0){
+      
+      modalUserList.classList.add('modalUserListNoUser')
+      
+      modalUserList.textContent = 'No user found'
+    }else{
+      modalUserList.classList.remove('modalUserListNoUser')
+      
+    }
+
+    selectedUserForGroup = []
+
+    newTempUser.forEach(user=>addUserToModalScreen(user))
+    
+    
+    })
 
 
     console.log("res ",res)
@@ -705,7 +767,7 @@ async function handleAddMember() {
 function addUserToModalScreen(user) {
   console.log("u: ", user);
 
-  let ItemToAdd = `<div class="groupItem userItems modelUser" id='${user.id}'>
+  let ItemToAdd = `<div onclick="handleNewUserSelected(${user.id})" class="groupItem userItems modelUser" id='modelUser${user.id}'>
               <div class="groupItem_profileImgDiv modelUserImg">
                 <img
                   id="groupItem_profileImg"
@@ -727,8 +789,73 @@ function addUserToModalScreen(user) {
   List.insertAdjacentHTML("beforeend", ItemToAdd);
 }
 
-function handleNewUserSearch(val){
+function handleNewUserSelected(userId){
 
-  console.log("val ",val)
+  let idx = selectedUserForGroup.indexOf(userId)
+  if(idx==-1){
+    selectedUserForGroup.push(userId)
+    document.querySelector(`#modelUser${userId}`).classList.add('groupSelected')
+    
+  }else{
+    selectedUserForGroup.splice(idx,1)
+    document.querySelector(`#modelUser${userId}`).classList.remove('groupSelected')
+  }
 
+  if(selectedUserForGroup.length>0){
+    document.querySelector('.addNewUserBtn').classList.add('addNewUserBtn_enable')
+  }else{
+    document.querySelector('.addNewUserBtn').classList.remove('addNewUserBtn_enable')
+  }
+
+
+}
+
+async function handleSubmitnewUsers() {
+  try{
+    if(selectedUserForGroup.length==0){
+      return
+    }
+    console.log("sel user of grp ",selectedUserForGroup)
+    console.log("selected group ",selectedGroup,selectedGroup.id)
+
+    let res = await axios.post(serverURL+"/group/addUserToGroup",{
+      groupId:selectedGroup.id,
+      usersToAdd:selectedUserForGroup
+    },jwt)
+
+    console.log("res",res)
+    if(res.data.message){
+      selectedUserForGroup=[]
+      document.getElementById('id01').style.display='none'
+
+      //get new users of current group 
+      await gettingGroupInfo()
+
+    }
+
+  }catch(err){
+    alert("something went wrong")
+    console.log("errf ",err)
+  }
+  
+}
+
+
+async function handleDeleteGroup() {
+  try{
+    let res = await axios.delete(serverURL+`/group/deleteGroup/${selectedGroup.id}`,jwt)
+    console.log("res ",res)
+
+    await getUserGroupNames()
+    document.querySelector(".contentDefaultConversation").style.display =
+    "flex";
+  document.querySelector(".contentConversation").style.display = "none";
+    handleToggleGroupSettingClose()
+    selectedGroup=''
+
+  }catch(err){
+    alert(err.response.data.error)
+    console.log("err: ",err)
+  }
+  
 }

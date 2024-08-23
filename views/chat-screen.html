@@ -367,13 +367,19 @@
 
                 <div class="w3-container">
                   <div class="modal_topbar">
-                    <i onclick="document.getElementById('id01').style.display='none'"  class="fa-solid fa-xmark fa-xmark_modal_x"></i>
-                    <p class="modal_topbar_p">Add Mmbers</p>
+                    <div class="modal_topbar_left">
+
+                      <i onclick="document.getElementById('id01').style.display='none'"  class="fa-solid fa-xmark fa-xmark_modal_x"></i>
+                      <p class="modal_topbar_p">Add Members</p>
+                    </div>
+                    <div>
+                      <button onclick="handleSubmitnewUsers()" class="addNewUserBtn">Add</button>
+                    </div>
                   </div>
                   <div class="modal_search">
                     <div class="modal_searchcont">
                       <i class="fa-solid fa-magnifying-glass fa-magnifying-glass_modalicon"></i>
-                      <input id="searchUserText" type="text" onchange="handleNewUserSearch(this.value)" placeholder="Search name, phone or email"
+                      <input id="searchUserText" type="text" placeholder="Search name, phone or email"
                         autocomplete="off" />
                     </div>
                   </div>
@@ -391,6 +397,10 @@
           <div class="groupSettingsSection_exitGroup">
             <i class="fa-solid fa-arrow-right-from-bracket fa-arrow-right-from-bracket_icon"></i>
             <p class="Exit_Group_text" onclick="handleExit()">Exit Group</p>
+          </div>
+          <div class="groupSettingsSection_deleteGroup" >
+            <i class="fa-solid fa-trash deleteGroupIcon"></i>
+            <p class="Exit_Group_text" onclick="handleDeleteGroup()">Delete Group</p>
           </div>
         </div>
 
