@@ -22,3 +22,23 @@ exports.authenticate = async (req,res,next)=>{
         })
     }
 }
+exports.socketAuthenticate = async (token)=>{
+
+    try{
+          
+        console.log("toenn  ",token)     
+        const obj = jwt.verify(token,process.env.tokenSecret)
+        console.log(obj)
+        let user = await User.findByPk(obj.id)
+        
+        if(!user){
+            throw new Error("User not found")
+        }
+        
+        return {success:true,user}
+        
+    }catch(err){
+        console.log("error ",err)
+        return {success:false}
+    }
+}

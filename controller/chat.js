@@ -3,22 +3,24 @@ const { Op } = require('sequelize');
 const User = require("../models/user");
 
 exports.chats =async (req,res,next)=>{
-    console.log("req body for chats ",req.body)
-
+    
     try{
+        console.log("req body for chats ",req.body)
         await req.user.createChat({
             message:req.body.message,
             messageOwner:req.user.name,
             groupId:req.body.groupId
         })
-        res.status(200).json({
-            success:true
-        })
+        // res.status(200).json({
+        //     success:true
+        // })
+        return true
     }catch(err){
         console.log("chat.js err", err)
-        res.status(500).json({
-            success:false
-        })
+        // res.status(500).json({
+            //     success:false
+            // })
+        return false
     }
 }
 

@@ -12,6 +12,18 @@ let verticalDot = document.querySelector(".vertical-dot-div");
 let verticalDotOpt = document.querySelector(".vertical-dot-div__options");
 let selectedUserForGroup = [];
 
+const socket = io(serverURL);
+socket.on('connect',()=>{
+  console.log("you connected with ",socket.id)
+
+
+  socket.on('received-message',(message,name)=>{
+    console.log("received-message ",message,name)
+    appendMessage(name,null,"left",message)
+  })
+})
+
+
 verticalDot.onclick = () => {
   verticalDotOpt.classList.toggle("active");
 };
@@ -93,12 +105,16 @@ document.querySelector(".chatSidebar__grouplist").onclick = (e) => {
       handleToggleGroupSettingClose()
 
       //
+      
       document.querySelector(".msger-chat").innerHTML = "";
     }
     // if(selectedGroup = "")
     groupItemElement.classList.toggle("selectedUser");
 
     selectedGroup = groupItemElement;
+
+    console.log("socket ",socket)
+    socket.emit("join-room",selectedGroup.id)
 
     // console.log("yes" , groupItemElement.id,groupItemElement)
     // console.log("yes ",groupItemElement.querySelector('#groupItem_profileName').textContent)
@@ -183,26 +199,49 @@ btn.onkeydown = function (e) {
 
 async function sendMessage() {
   try {
-    console.log("submit button clicked");
+
     let new_message = document.getElementById("messageToSend").value;
-    if (new_message.trim().length == 0) {
-      return;
-    }
-    document.getElementById("messageToSend").value = "";
-    console.log("new message: ", new_message);
-    const token = localStorage.getItem("token");
-    let result = await axios.post(
-      serverURL + "/chat",
-      { message: new_message, groupId: selectedGroup.id },
-      {
-        headers: {
-          Authorization: token,
-        },
+    socket.emit('new-message',new_message,selectedGroup.id,token,(response)=>{
+      console.log("response after sending messag",response)
+
+      if(response.status==false){
+        console.log("196")
+        window.location.href = "/login";
+        localStorage.clear();
+      }else if(response.status=="not saved"){
+        alert("message not sended")
       }
-    );
-    // getAllChats();
-    getGroupMessages(selectedGroup.id);
-    console.log("result ", result);
+      else{
+        document.getElementById("messageToSend").value=''
+        appendMessage(
+          response.name,
+          null,
+          "right",
+          new_message
+        )
+
+      }
+
+    })
+    // console.log("submit button clicked");
+    // if (new_message.trim().length == 0) {
+    //   return;
+    // }
+    // document.getElementById("messageToSend").value = "";
+    // console.log("new message: ", new_message);
+    // const token = localStorage.getItem("token");
+    // let result = await axios.post(
+    //   serverURL + "/chat",
+    //   { message: new_message, groupId: selectedGroup.id },
+    //   {
+    //     headers: {
+    //       Authorization: token,
+    //     },
+    //   }
+    // );
+    // // getAllChats();
+    // getGroupMessages(selectedGroup.id);
+    // console.log("result ", result);
   } catch (err) {
     console.log("error : ", err);
   }

@@ -5,7 +5,16 @@ const path = require('path')
 const fs = require('fs')
 
 
+
+
 const app = express()
+
+//socket io initialization
+const server = require('http').Server(app)
+
+require('./services/socket').socketConnect(server)
+
+
 
 const sequelize = require('./utils/database')
 
@@ -52,12 +61,16 @@ Group.belongsToMany(User,{through:UserGroup})
 Group.hasMany(Chat)
 Chat.belongsTo(Group)
 
+// io.on('connection', (socket) => {
+//     console.log('a user connected');
+//   });
+  
 sequelize
 .sync()
 // .sync({force:true})
 // .sync({alter:true})
 .then(()=>{
-    app.listen(process.env.PORT,()=>{
+    server.listen(process.env.PORT,()=>{
         console.log(`Server running at port ${process.env.PORT}`)
     })
 }).catch(e=>console.log("eerro : ",e))
