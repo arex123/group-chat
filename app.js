@@ -4,16 +4,12 @@ const bodyParser = require('body-parser')
 const path = require('path')
 const fs = require('fs')
 
-
-
-
 const app = express()
 
 //socket io initialization
 const server = require('http').Server(app)
 
 require('./services/socket').socketConnect(server)
-
 
 
 const sequelize = require('./utils/database')
@@ -34,6 +30,11 @@ app.use('/user',userRouter)
 app.use(chatRoutes)
 app.use('/group',groupRoutes)
 
+
+
+const archiveCronJob = require('./services/cron')
+archiveCronJob.start()
+// console.log("cron ",cron)
 
 app.use((req,res) => {
     // console.log("hi: ", __dirname, req.url);
