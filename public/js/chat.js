@@ -13,16 +13,18 @@ let verticalDotOpt = document.querySelector(".vertical-dot-div__options");
 let selectedUserForGroup = [];
 
 const socket = io(serverURL);
-socket.on('connect',()=>{
-  console.log("you connected with ",socket.id)
+socket.on("connect", () => {
+  console.log("you connected with ", socket.id);
 
+  socket.on("received-message", (message, name, isImage) => {
+    console.log("received-message ", message, name, isImage);
+    appendMessage(name, null, "left", message, isImage);
+  });
 
-  socket.on('received-message',(message,name)=>{
-    console.log("received-message ",message,name)
-    appendMessage(name,null,"left",message)
-  })
-})
-
+  socket.on("disconnect", () => {
+    console.log("User disconnected client side warning");
+  });
+});
 
 verticalDot.onclick = () => {
   verticalDotOpt.classList.toggle("active");
@@ -98,14 +100,13 @@ document.querySelector(".chatSidebar__grouplist").onclick = (e) => {
     // if(selectedGroup!=""){
     //   handleToggleGroupSetting()
     // }
-    
 
     if (selectedGroup != "" && selectedGroup?.id != groupItemElement.id) {
       selectedGroup.classList.toggle("selectedUser");
-      handleToggleGroupSettingClose()
+      handleToggleGroupSettingClose();
 
       //
-      
+
       document.querySelector(".msger-chat").innerHTML = "";
     }
     // if(selectedGroup = "")
@@ -113,8 +114,8 @@ document.querySelector(".chatSidebar__grouplist").onclick = (e) => {
 
     selectedGroup = groupItemElement;
 
-    console.log("socket ",socket)
-    socket.emit("join-room",selectedGroup.id)
+    console.log("joining room");
+    socket.emit("join-room", selectedGroup.id);
 
     // console.log("yes" , groupItemElement.id,groupItemElement)
     // console.log("yes ",groupItemElement.querySelector('#groupItem_profileName').textContent)
@@ -126,7 +127,6 @@ document.querySelector(".chatSidebar__grouplist").onclick = (e) => {
       groupItemElement.querySelector("#groupItem_profileName").textContent;
 
     console.log("opening group");
-
     getGroupMessages(groupItemElement.id);
   } else {
     console.log("no", e.target);
@@ -152,10 +152,11 @@ document.querySelector(".createGroupSection_userlist").onclick = (e) => {
   }
 };
 
-function appendMessage(name, img, side, text) {
+function appendMessage(name, img, side, text, isImage) {
   if (!img) img = "https://image.flaticon.com/icons/svg/145/145867.svg";
   //   Simple solution for small apps
-  const msgHTML = `
+
+  let msgHTML = `
       <div class="msg ${side}-msg">
       <div class="msg-img" style="background-image: url(${img})"></div>
 
@@ -168,24 +169,27 @@ function appendMessage(name, img, side, text) {
       </div>
       </div>
   `;
-  // const msgHTML = `
-  //     <div class="msg ${side}-msg">
-  //     <div class="msg-img" style="background-image: url(${img})"></div>
+  if (isImage) {
+    msgHTML = `
+    <div class="msg ${side}-msg">
+    <div class="msg-img" style="background-image: url(${img})"></div>
 
-  //     <div class="msg-bubble">
-  //         <div class="msg-info">
-  //         <div class="msg-info-name">${name}</div>
-  //         <div class="msg-info-time">date</div>
-  //         </div>
+    <div class="msg-bubble">
+        <div class="msg-info">
+        <div class="msg-info-name">${name}</div>
+        </div>
 
-  //         <div class="msg-text">${text}</div>
-  //     </div>
-  //     </div>
-  // `;
-
+        <div class="msg-image">
+          <img class="msg-image-chat" onclick="handleShowFullImage('${text}')" src="${text}" alt="img"/>
+        </div>
+    </div>
+    </div>
+`;
+  }
   let msgerChat = document.querySelector(".msger-chat");
   msgerChat.insertAdjacentHTML("beforeend", msgHTML);
-  msgerChat.scrollTop += 500;
+  msgerChat.scrollTop = msgerChat.scrollHeight;
+  console.log("msgerChat height ", msgerChat.scrollHeight);
 }
 
 btn.onkeydown = function (e) {
@@ -199,30 +203,27 @@ btn.onkeydown = function (e) {
 
 async function sendMessage() {
   try {
-
     let new_message = document.getElementById("messageToSend").value;
-    socket.emit('new-message',new_message,selectedGroup.id,token,(response)=>{
-      console.log("response after sending messag",response)
+    socket.emit(
+      "new-message",
+      new_message,
+      selectedGroup.id,
+      token,
+      (response) => {
+        console.log("response after sending messag", response);
 
-      if(response.status==false){
-        console.log("196")
-        window.location.href = "/login";
-        localStorage.clear();
-      }else if(response.status=="not saved"){
-        alert("message not sended")
+        if (response.status == false) {
+          console.log("196");
+          window.location.href = "/login";
+          localStorage.clear();
+        } else if (response.status == "not saved") {
+          alert("message not sended");
+        } else {
+          document.getElementById("messageToSend").value = "";
+          appendMessage(response.name, null, "right", new_message);
+        }
       }
-      else{
-        document.getElementById("messageToSend").value=''
-        appendMessage(
-          response.name,
-          null,
-          "right",
-          new_message
-        )
-
-      }
-
-    })
+    );
     // console.log("submit button clicked");
     // if (new_message.trim().length == 0) {
     //   return;
@@ -338,7 +339,7 @@ async function getUserGroupNames() {
       },
     });
 
-    document.querySelector('.chatSidebar__grouplist').innerHTML=''
+    document.querySelector(".chatSidebar__grouplist").innerHTML = "";
     groupNameRes.data.forEach((gdata) => showGroups(gdata));
   } catch (err) {
     console.log("ee ", err);
@@ -385,13 +386,14 @@ async function getGroupMessages(id) {
     console.log("msf ", messages);
     // let groupsOwnerId = selectedGroup.getAttribute('ukey')
     // document.querySelector('.msger-chat').innerHTML=''
-    document.querySelector(".msger-chat").innerHTML=''
+    document.querySelector(".msger-chat").innerHTML = "";
     messages.data.messages.forEach((msg) =>
       appendMessage(
         msg.messageOwner,
         null,
         messages.data.currUser == msg.userId ? "right" : "left",
-        msg.message
+        msg.message,
+        msg.isImage
       )
     );
   } catch (err) {
@@ -404,8 +406,8 @@ async function handleCreateGroup() {
   // e.preventDefault()
 
   let groupName = document.getElementById("newGroupName").value;
-  if(groupName.length==0){
-    groupName = "new group"
+  if (groupName.length == 0) {
+    groupName = "new group";
   }
   console.log("Creating group", groupName, selectedUserForGroup);
   try {
@@ -448,8 +450,7 @@ function handleLogOut() {
   localStorage.clear();
   window.location.href = "/login";
 }
-function handleToggleGroupSettingClose(){
-
+function handleToggleGroupSettingClose() {
   let gss = document.querySelector(".groupSettingsSection");
   gss.classList.remove("groupSettingsSection_open");
 }
@@ -460,14 +461,12 @@ async function handleToggleGroupSetting() {
   if (gss.classList.contains("groupSettingsSection_open") == false) {
     //get groups users from backend
 
-    await gettingGroupInfo()
-
+    await gettingGroupInfo();
   }
   gss.classList.toggle("groupSettingsSection_open");
 }
 
-async function gettingGroupInfo(){
-
+async function gettingGroupInfo() {
   try {
     console.log("selectedGroup.id", selectedGroup.id);
 
@@ -480,7 +479,6 @@ async function gettingGroupInfo(){
     let { currUser, groupDetail, isAdmin, isCreator } = result.data;
     let { groupDescription, groupName, createdAt, users } = groupDetail;
 
-
     groupDescription = groupDescription ?? "des";
 
     document.querySelector(".groupSettingsSection_newname").textContent =
@@ -488,14 +486,16 @@ async function gettingGroupInfo(){
     document.querySelector(".groupSettingsSection_newgname").textContent =
       groupDescription;
 
-      if(!isAdmin){
-        //disable name and desc editing
-        document.querySelector('.fa-pen-gname-edit').style.display='none'
-        document.querySelector('.fa-pen-gdesc-edit').style.display='none'
-        document.querySelector('.groupSettingsSection_userList').style.display='none'
-      }
+    if (!isAdmin) {
+      //disable name and desc editing
+      document.querySelector(".fa-pen-gname-edit").style.display = "none";
+      document.querySelector(".fa-pen-gdesc-edit").style.display = "none";
+      document.querySelector(".groupSettingsSection_userList").style.display =
+        "none";
+    }
 
-      document.querySelector(".groupSettingsSection_userList_users").innerHTML=''
+    document.querySelector(".groupSettingsSection_userList_users").innerHTML =
+      "";
     addUserToGroupListScreen(
       currUser.id,
       "You",
@@ -545,19 +545,22 @@ async function submitChangeGpSetting(type) {
   if (type == "name") {
     //call backend to update group name
 
+    console.log(
+      "new gname",
+      document.querySelector(".groupSettingsSection_newname").textContent
+    );
 
-    console.log("new gname",document.querySelector('.groupSettingsSection_newname').textContent)
+    let result = await axios.post(
+      serverURL + "/group/updateGroupNameOrDesc",
+      {
+        groupId: selectedGroup.id,
+        groupName: document.querySelector(".groupSettingsSection_newname")
+          .textContent,
+      },
+      jwt
+    );
 
-
-    let result = await axios.post(serverURL+"/group/updateGroupNameOrDesc",{
-      groupId:selectedGroup.id,
-      groupName:document.querySelector('.groupSettingsSection_newname').textContent
-    },
-  jwt)
-
-  console.log("result ",result)
-
-
+    console.log("result ", result);
 
     document.querySelector(".fa-pen-gname-edit").style.display = "block";
     document.querySelector(".fa-check-gname-ok").style.display = "none";
@@ -568,19 +571,23 @@ async function submitChangeGpSetting(type) {
       .querySelector(".groupSettingsSection_newname")
       .classList.toggle("makeeditable");
   } else if (type == "desc") {
+    console.log(
+      "new gname",
+      document.querySelector(".groupSettingsSection_newgname").textContent
+    );
 
+    let result = await axios.post(
+      serverURL + "/group/updateGroupNameOrDesc",
+      {
+        groupId: selectedGroup.id,
+        groupDescription: document.querySelector(
+          ".groupSettingsSection_newgname"
+        ).textContent,
+      },
+      jwt
+    );
 
-    console.log("new gname",document.querySelector('.groupSettingsSection_newgname').textContent)
-
-
-    let result = await axios.post(serverURL+"/group/updateGroupNameOrDesc",{
-      groupId:selectedGroup.id,
-      groupDescription:document.querySelector('.groupSettingsSection_newgname').textContent
-    },
-  jwt)
-
-  console.log("result ",result)
-
+    console.log("result ", result);
 
     document.querySelector(".fa-pen-gdesc-edit").style.display = "block";
     document.querySelector(".fa-check-gdesc-ok").style.display = "none";
@@ -596,7 +603,7 @@ async function submitChangeGpSetting(type) {
 
 async function makeAdmin(userId, groupId) {
   try {
-    console.log("ids: ",userId,groupId)
+    console.log("ids: ", userId, groupId);
     let res = await axios.post(
       serverURL + "/group/makeAdmin",
       {
@@ -608,38 +615,41 @@ async function makeAdmin(userId, groupId) {
 
     console.log("resss ", res);
 
-    if(res.data.success){
-      let selTag = document.querySelector(`.vertical-dot-div__options_gs${userId}`)
-      selTag.innerHTML='<p onclick="handleLogOut()">Remove User</p>'
+    if (res.data.success) {
+      let selTag = document.querySelector(
+        `.vertical-dot-div__options_gs${userId}`
+      );
+      selTag.innerHTML = '<p onclick="handleLogOut()">Remove User</p>';
 
-      document.querySelector(`.groupSettingsSection_userListrole${userId}`).innerHTML = 'admin'
-
+      document.querySelector(
+        `.groupSettingsSection_userListrole${userId}`
+      ).innerHTML = "admin";
     }
-
   } catch (err) {
     console.log("error ", err);
   }
 }
 
 async function removeUser(userId) {
+  try {
+    let res = await axios.post(
+      serverURL + "/group/removeMember",
+      {
+        userId,
+        groupId: selectedGroup.id,
+      },
+      jwt
+    );
 
-  try{
-    let res = await axios.post(serverURL+"/group/removeMember",{
-      userId,
-      groupId:selectedGroup.id
-    },jwt)
-
-    console.log("res",res)
-    if(res.data.success){
-      document.querySelector(`#userItemsList${userId}`).remove()
+    console.log("res", res);
+    if (res.data.success) {
+      document.querySelector(`#userItemsList${userId}`).remove();
     }
-  }catch(err){
-    alert("something went wrong",err.message)
-    console.log(err)
+  } catch (err) {
+    alert("something went wrong", err.message);
+    console.log(err);
   }
-  
 }
-
 
 function addUserToGroupListScreen(id, name, phone, role, isCurrAdmin) {
   // console.log("u: ", user);
@@ -648,10 +658,9 @@ function addUserToGroupListScreen(id, name, phone, role, isCurrAdmin) {
   // let phone = user.phone
   // let role = user.UserGroup.role
 
-  
   let OptionContent = "";
 
-  console.log("isCurrAdmin ",isCurrAdmin)
+  console.log("isCurrAdmin ", isCurrAdmin);
   if (isCurrAdmin) {
     if (role == "member") {
       OptionContent = `  <div class='vertical-dot-div_gs${id}' onclick="handleOpenGCS2(${id})">
@@ -722,85 +731,87 @@ function closeGCS2() {
 //   document.getElementById('id01').style.display='none'
 // }
 
-async function handleExit(){
-  try{
+async function handleExit() {
+  try {
+    let res = await axios.post(
+      serverURL + "/group/leaveGroup",
+      { groupId: selectedGroup.id },
+      jwt
+    );
 
-    let res = await axios.post(serverURL+"/group/leaveGroup",{groupId:selectedGroup.id},jwt)
-    
-    console.log(res)
+    console.log(res);
 
-    await getUserGroupNames()
+    await getUserGroupNames();
     document.querySelector(".contentDefaultConversation").style.display =
-    "flex";
-  document.querySelector(".contentConversation").style.display = "none";
-    handleToggleGroupSettingClose()
-    selectedGroup=''
-
-  }catch(err){
-    alert(err.response.data.error)
-    console.log("ee ",err)
+      "flex";
+    document.querySelector(".contentConversation").style.display = "none";
+    handleToggleGroupSettingClose();
+    selectedGroup = "";
+  } catch (err) {
+    alert(err.response.data.error);
+    console.log("ee ", err);
   }
 }
 
 async function handleAddMember() {
+  document.getElementById("id01").style.display = "block";
 
-  document.getElementById('id01').style.display='block'
+  try {
+    let res = await axios.get(
+      serverURL + `/group/${selectedGroup.id}/usersOutsideGroup`,
+      jwt
+    );
 
-  try{
-    let res = await axios.get(serverURL+`/group/${selectedGroup.id}/usersOutsideGroup`,jwt)
+    let users = res.data;
 
-    let users = res.data
+    let tempData = [...users];
 
-    let tempData = [...users]
+    document.querySelector(".modal_users").innerHTML = "";
 
+    selectedUserForGroup = [];
 
-    document.querySelector(".modal_users").innerHTML='';
+    tempData.forEach((user) => addUserToModalScreen(user));
 
-    selectedUserForGroup = []
+    document
+      .querySelector("#searchUserText")
+      .addEventListener("input", function () {
+        let newval = this.value.toLowerCase().trim();
+        console.log("val ", newval);
+        let tempUserCopy = [...users];
+        let newTempUser = [];
 
-    tempData.forEach(user=>addUserToModalScreen(user))
+        newTempUser = tempUserCopy.filter((user) => user.name.includes(newval));
+        if (newTempUser.length == 0) {
+          newTempUser = tempUserCopy.filter((user) =>
+            user.email.includes(newval)
+          );
+        }
+        if (newTempUser.length == 0) {
+          newTempUser = tempUserCopy.filter((user) =>
+            user.phone.includes(newval)
+          );
+        }
 
+        let modalUserList = document.querySelector(".modal_users");
+        modalUserList.innerHTML = "";
 
-    document.querySelector('#searchUserText').addEventListener('input',function(){
-      let newval = this.value.toLowerCase().trim()
-      console.log("val ",newval)
-      let tempUserCopy = [...users]
-      let newTempUser = []
-      
-      newTempUser = tempUserCopy.filter(user=>user.name.includes(newval))
-      if(newTempUser.length==0){
-        newTempUser = tempUserCopy.filter(user=>user.email.includes(newval))
-      }
-      if(newTempUser.length==0){
-        newTempUser = tempUserCopy.filter(user=>user.phone.includes(newval))
-      }
+        if (newTempUser.length == 0) {
+          modalUserList.classList.add("modalUserListNoUser");
 
-    let modalUserList =  document.querySelector(".modal_users")
-    modalUserList.innerHTML='';
+          modalUserList.textContent = "No user found";
+        } else {
+          modalUserList.classList.remove("modalUserListNoUser");
+        }
 
-    if(newTempUser.length==0){
-      
-      modalUserList.classList.add('modalUserListNoUser')
-      
-      modalUserList.textContent = 'No user found'
-    }else{
-      modalUserList.classList.remove('modalUserListNoUser')
-      
-    }
+        selectedUserForGroup = [];
 
-    selectedUserForGroup = []
+        newTempUser.forEach((user) => addUserToModalScreen(user));
+      });
 
-    newTempUser.forEach(user=>addUserToModalScreen(user))
-    
-    
-    })
-
-
-    console.log("res ",res)
-  }catch(err){
-    console.log("err",err)
+    console.log("res ", res);
+  } catch (err) {
+    console.log("err", err);
   }
-  
 }
 
 function addUserToModalScreen(user) {
@@ -828,73 +839,181 @@ function addUserToModalScreen(user) {
   List.insertAdjacentHTML("beforeend", ItemToAdd);
 }
 
-function handleNewUserSelected(userId){
-
-  let idx = selectedUserForGroup.indexOf(userId)
-  if(idx==-1){
-    selectedUserForGroup.push(userId)
-    document.querySelector(`#modelUser${userId}`).classList.add('groupSelected')
-    
-  }else{
-    selectedUserForGroup.splice(idx,1)
-    document.querySelector(`#modelUser${userId}`).classList.remove('groupSelected')
+function handleNewUserSelected(userId) {
+  let idx = selectedUserForGroup.indexOf(userId);
+  if (idx == -1) {
+    selectedUserForGroup.push(userId);
+    document
+      .querySelector(`#modelUser${userId}`)
+      .classList.add("groupSelected");
+  } else {
+    selectedUserForGroup.splice(idx, 1);
+    document
+      .querySelector(`#modelUser${userId}`)
+      .classList.remove("groupSelected");
   }
 
-  if(selectedUserForGroup.length>0){
-    document.querySelector('.addNewUserBtn').classList.add('addNewUserBtn_enable')
-  }else{
-    document.querySelector('.addNewUserBtn').classList.remove('addNewUserBtn_enable')
+  if (selectedUserForGroup.length > 0) {
+    document
+      .querySelector(".addNewUserBtn")
+      .classList.add("addNewUserBtn_enable");
+  } else {
+    document
+      .querySelector(".addNewUserBtn")
+      .classList.remove("addNewUserBtn_enable");
   }
-
-
 }
 
 async function handleSubmitnewUsers() {
-  try{
-    if(selectedUserForGroup.length==0){
-      return
+  try {
+    if (selectedUserForGroup.length == 0) {
+      return;
     }
-    console.log("sel user of grp ",selectedUserForGroup)
-    console.log("selected group ",selectedGroup,selectedGroup.id)
+    console.log("sel user of grp ", selectedUserForGroup);
+    console.log("selected group ", selectedGroup, selectedGroup.id);
 
-    let res = await axios.post(serverURL+"/group/addUserToGroup",{
-      groupId:selectedGroup.id,
-      usersToAdd:selectedUserForGroup
-    },jwt)
+    let res = await axios.post(
+      serverURL + "/group/addUserToGroup",
+      {
+        groupId: selectedGroup.id,
+        usersToAdd: selectedUserForGroup,
+      },
+      jwt
+    );
 
-    console.log("res",res)
-    if(res.data.message){
-      selectedUserForGroup=[]
-      document.getElementById('id01').style.display='none'
+    console.log("res", res);
+    if (res.data.message) {
+      selectedUserForGroup = [];
+      document.getElementById("id01").style.display = "none";
 
-      //get new users of current group 
-      await gettingGroupInfo()
-
+      //get new users of current group
+      await gettingGroupInfo();
     }
-
-  }catch(err){
-    alert("something went wrong")
-    console.log("errf ",err)
+  } catch (err) {
+    alert("something went wrong");
+    console.log("errf ", err);
   }
-  
 }
 
-
 async function handleDeleteGroup() {
-  try{
-    let res = await axios.delete(serverURL+`/group/deleteGroup/${selectedGroup.id}`,jwt)
-    console.log("res ",res)
+  try {
+    let res = await axios.delete(
+      serverURL + `/group/deleteGroup/${selectedGroup.id}`,
+      jwt
+    );
+    console.log("res ", res);
 
-    await getUserGroupNames()
+    await getUserGroupNames();
     document.querySelector(".contentDefaultConversation").style.display =
-    "flex";
-  document.querySelector(".contentConversation").style.display = "none";
-    handleToggleGroupSettingClose()
-    selectedGroup=''
-
-  }catch(err){
-    alert(err.response.data.error)
-    console.log("err: ",err)
+      "flex";
+    document.querySelector(".contentConversation").style.display = "none";
+    handleToggleGroupSettingClose();
+    selectedGroup = "";
+  } catch (err) {
+    alert(err.response.data.error);
+    console.log("err: ", err);
   }
-  
+}
+
+// let imgInpTag = document.getElementById('imageInput')
+function handleImageMessage(event) {
+  // Get the selected file
+  console.log("907", event);
+  try {
+    const file = event.files[0];
+    console.log("files ", file, "selectedGroup.id: ", selectedGroup.id);
+
+    let msgHTML = `
+      <div class="msg right-msg mytempImgLoader">
+      <div class="msg-img" style="background-image: url(https://image.flaticon.com/icons/svg/145/145867.svg)"></div>
+
+      <div class="msg-bubble">
+          <div class="msg-info">
+          <div class="msg-info-name"></div>
+          </div>
+
+          <div class="msg-text">
+          
+            <div class="ImgSendloader"></div>
+
+          </div>
+      </div>
+      </div>
+    `;
+   
+    let msgerChat = document.querySelector(".msger-chat");
+    msgerChat.insertAdjacentHTML("beforeend", msgHTML);
+
+    socket.emit(
+      "new-img-message",
+      file,
+      file.name,
+      selectedGroup.id,
+      token,
+      (response) => {
+        console.log("response after sending messag", response);
+
+        if (response.status == false) {
+          console.log("196");
+          window.location.href = "/login";
+          localStorage.clear();
+        } else if (response.status == "not saved") {
+          alert("message not sended");
+        } else {
+          document.querySelectorAll('.mytempImgLoader').forEach(function(el) {
+            el.remove();
+          });
+          console.log("930 ", "success file upload");
+          appendMessage(response.name, null, "right", response.fileUrl,true);
+        }
+      }
+    );
+
+    // Create a new FileReader object
+    // const reader = new FileReader();
+
+    // // Define a function to handle the file reading
+    // reader.onload = function(event) {
+    //   // Get the file contents
+    //   const imageData = event.target.result;
+
+    //   // Create a new image element
+    //   const image = document.createElement('img');
+    //   image.className='ImageChat'
+
+    //   // Set the image source to the file contents
+    //   image.src = imageData;
+
+    //   // Add the image to the page
+    //   let imageAppendOn = document.querySelector('.msger-chat')
+    //   imageAppendOn.appendChild(image);
+    // };
+
+    // // Read the file as a data URL
+    // reader.readAsDataURL(file);
+  } catch (err) {
+    console.log("err file ", err);
+  }
+}
+
+// Get the modal
+var modal = document.getElementById("myModal");
+
+// Get the image and insert it inside the modal - use its "alt" text as a caption
+// var img = document.getElementById("myImg");
+var modalImg = document.getElementById("img01");
+var captionText = document.getElementById("caption");
+function handleShowFullImage(imgLink){  
+console.log("imgLink" ,imgLink)
+  modalImg.src = imgLink;
+  modal.style.display = "block";
+  // captionText.innerHTML = this.alt;
+}
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() { 
+  modal.style.display = "none";
 }

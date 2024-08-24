@@ -6,10 +6,12 @@ exports.chats =async (req,res,next)=>{
     
     try{
         console.log("req body for chats ",req.body)
+
         await req.user.createChat({
             message:req.body.message,
             messageOwner:req.user.name,
-            groupId:req.body.groupId
+            groupId:req.body.groupId,
+            isImage:req.body.isImage
         })
         // res.status(200).json({
         //     success:true
@@ -41,7 +43,8 @@ exports.getChats = async (req,res,next)=>{
             attributes: [
                 "id",
                 "message",
-                "messageOwner"
+                "messageOwner",
+                "isImage"
             ],
             // include: [
             //     {

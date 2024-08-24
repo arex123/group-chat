@@ -126,7 +126,7 @@ exports.getGroupMessages = async (req, res, next) => {
         where: {
           groupid: groupId,
         },
-        attributes: ["id", "message", "messageOwner", "userId"],
+        attributes: ["id", "message", "messageOwner","isImage", "userId"],
       });
 
       res.status(200).json({ messages, currUser: req.user.id });
